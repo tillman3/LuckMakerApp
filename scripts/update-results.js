@@ -87,24 +87,35 @@ function parseJackpot(text) {
 }
 
 // Insert draws into DB (skip duplicates)
+// Note: SQLite treats NULL != NULL for UNIQUE constraints,
+// so we use a check-then-insert approach for reliability.
 function insertDraws(gameId, drawings) {
+  const check = db.prepare(`
+    SELECT id FROM draws 
+    WHERE game_id = ? AND draw_date = ? AND COALESCE(draw_time, '') = ? AND numbers = ?
+    LIMIT 1
+  `);
   const insert = db.prepare(`
-    INSERT OR IGNORE INTO draws (game_id, draw_date, draw_time, numbers, bonus_number, jackpot)
+    INSERT INTO draws (game_id, draw_date, draw_time, numbers, bonus_number, jackpot)
     VALUES (?, ?, ?, ?, ?, ?)
   `);
   
   let inserted = 0;
   const tx = db.transaction(() => {
     for (const d of drawings) {
-      const result = insert.run(
-        gameId,
-        d.drawDate,
-        d.drawTime || null,
-        d.numbers.join(','),
-        d.bonus ? String(d.bonus) : null,
-        d.jackpot
-      );
-      if (result.changes > 0) inserted++;
+      const nums = d.numbers.join(',');
+      const existing = check.get(gameId, d.drawDate, d.drawTime || '', nums);
+      if (!existing) {
+        insert.run(
+          gameId,
+          d.drawDate,
+          d.drawTime || null,
+          nums,
+          d.bonus ? String(d.bonus) : null,
+          d.jackpot
+        );
+        inserted++;
+      }
     }
   });
   tx();
