@@ -129,10 +129,10 @@ export default function PoolPage() {
   if (view === 'landing') {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl sm:text-4xl font-black mb-2">
+        <h1 className="text-3xl sm:text-5xl font-black mb-3 tracking-tight animate-fade-in-up">
           👥 Lottery <span className="text-gold text-glow-gold">Pool Manager</span>
         </h1>
-        <p className="text-gray-400 mb-8">
+        <p className="text-gray-500 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
           The tamper-proof way to run a group lottery pool. Every action logged, every ticket verified.
         </p>
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 interface CountdownProps {
-  targetDate: string; // ISO date string
+  targetDate: string;
   label?: string;
 }
 
@@ -13,7 +13,7 @@ export function Countdown({ targetDate, label = 'Next Draw' }: CountdownProps) {
   useEffect(() => {
     const update = () => {
       const now = new Date();
-      const target = new Date(targetDate + 'T22:00:00-06:00'); // 10 PM CT typical draw time
+      const target = new Date(targetDate + 'T22:00:00-06:00');
       const diff = target.getTime() - now.getTime();
       
       if (diff <= 0) {
@@ -37,9 +37,19 @@ export function Countdown({ targetDate, label = 'Next Draw' }: CountdownProps) {
 
   return (
     <div className="text-center">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
-      <div className="countdown-digit text-lg font-bold text-gold">
-        {pad(timeLeft.hours)}:{pad(timeLeft.minutes)}:{pad(timeLeft.seconds)}
+      <div className="text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-1.5">{label}</div>
+      <div className="inline-flex items-center gap-1">
+        {[
+          { val: pad(timeLeft.hours), label: 'h' },
+          { val: pad(timeLeft.minutes), label: 'm' },
+          { val: pad(timeLeft.seconds), label: 's' },
+        ].map((unit, i) => (
+          <div key={i} className="flex items-baseline gap-0.5">
+            <span className="countdown-digit text-lg font-black text-gold">{unit.val}</span>
+            <span className="text-[9px] text-gray-600 font-semibold">{unit.label}</span>
+            {i < 2 && <span className="text-gold/30 font-bold mx-0.5">:</span>}
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -2,32 +2,35 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="bg-dark-800 border-t border-dark-600 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="border-t border-white/[0.03] mt-auto bg-dark-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2.5 mb-4">
               <span className="text-xl">🍀</span>
-              <span className="font-bold text-lg">
-                <span className="text-neon">Luck</span> Maker <span className="text-gold">3000</span>
-              </span>
+              <div className="flex items-baseline gap-0.5">
+                <span className="font-black text-neon text-base">LUCK</span>
+                <span className="font-black text-white/80 text-base">MAKER</span>
+                <span className="font-black text-gold text-base">3000</span>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
               Smart lottery analytics. Real math, real odds, real utility.
               We help you play smarter — we don&apos;t predict winners.
             </p>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-300 mb-3">Links</h3>
-            <div className="flex flex-col gap-2 text-sm">
-              <Link href="/about" className="text-gray-500 hover:text-neon transition-colors">How It Works</Link>
-              <Link href="/pricing" className="text-gray-500 hover:text-neon transition-colors">Pricing</Link>
-              <Link href="/games" className="text-gray-500 hover:text-neon transition-colors">All Games</Link>
+            <h3 className="font-bold text-gray-400 text-xs uppercase tracking-wider mb-4">Links</h3>
+            <div className="flex flex-col gap-2.5 text-sm">
+              <Link href="/about" className="text-gray-600 hover:text-white transition-colors">How It Works</Link>
+              <Link href="/pricing" className="text-gray-600 hover:text-white transition-colors">Pricing</Link>
+              <Link href="/games" className="text-gray-600 hover:text-white transition-colors">All Games</Link>
+              <Link href="/results" className="text-gray-600 hover:text-white transition-colors">Results</Link>
             </div>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-300 mb-3">Disclaimer</h3>
-            <p className="text-xs text-gray-600">
+            <h3 className="font-bold text-gray-400 text-xs uppercase tracking-wider mb-4">Disclaimer</h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
               Lottery is entertainment. The house always has an edge. Past results do not 
               predict future outcomes. Expected value calculations are estimates based on 
               publicly available data. Luck Maker 3000 does not sell lottery tickets or 
@@ -35,7 +38,8 @@ export function Footer() {
             </p>
           </div>
         </div>
-        <div className="mt-8 pt-4 border-t border-dark-700 text-center text-xs text-gray-600">
+        <div className="section-divider" />
+        <div className="text-center text-xs text-gray-700">
           © {new Date().getFullYear()} Luck Maker 3000. All rights reserved. Not affiliated with any state lottery commission.
         </div>
       </div>

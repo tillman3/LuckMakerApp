@@ -14,7 +14,7 @@ const tiers = [
     yearlyPrice: null,
     period: 'forever',
     description: 'Everything you need to start',
-    borderClass: 'border-white/5',
+    borderClass: 'border-white/[0.04]',
     plan: null,
     features: [
       'All draw results — every game',
@@ -39,7 +39,7 @@ const tiers = [
     yearlyPrice: '$49.99',
     period: '/month',
     description: 'For players who want an edge',
-    borderClass: 'border-neon/30',
+    borderClass: 'border-neon/20',
     plan: 'pro_monthly',
     popular: true,
     features: [
@@ -65,7 +65,7 @@ const tiers = [
     yearlyPrice: '$99.99',
     period: '/month',
     description: 'For groups & power users',
-    borderClass: 'border-gold/30',
+    borderClass: 'border-gold/20',
     plan: 'premium_monthly',
     features: [
       'Everything in Pro, plus:',
@@ -84,57 +84,59 @@ const tiers = [
 
 export default function PricingPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <div className="text-center mb-10 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl font-black mb-3">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+      <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+        <h1 className="text-3xl sm:text-5xl font-black mb-4 tracking-tight">
           Simple, <span className="text-gold text-glow-gold">Honest</span> Pricing
         </h1>
-        <p className="text-gray-400 sm:text-lg">
+        <p className="text-gray-500 sm:text-lg max-w-md mx-auto">
           Most features are free. Upgrade when you&apos;re ready.
         </p>
-        <p className="text-xs text-gray-600 mt-2">
+        <p className="text-xs text-gray-600 mt-3 font-medium">
           💰 Save ~40% with annual billing
         </p>
       </div>
 
-      {/* Mobile: stack vertically. Desktop: 3 columns */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-        {tiers.map(tier => (
+        {tiers.map((tier, i) => (
           <div 
             key={tier.name} 
-            className={`relative rounded-2xl border bg-white/[0.02] backdrop-blur-sm p-5 sm:p-6 flex flex-col ${tier.borderClass} ${tier.popular ? 'ring-1 ring-neon/20 shadow-[0_0_20px_rgba(0,255,136,0.05)]' : ''}`}
+            className={`relative rounded-2xl border bg-gradient-to-b from-white/[0.02] to-transparent backdrop-blur-sm p-5 sm:p-7 flex flex-col ${tier.borderClass} ${tier.popular ? 'ring-1 ring-neon/15 shadow-[0_0_30px_rgba(0,255,136,0.04)]' : ''} animate-fade-in-up`}
+            style={{ animationDelay: `${i * 0.1}s` }}
           >
             {tier.popular && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-neon text-dark-900 text-[11px] font-black rounded-full uppercase tracking-wider whitespace-nowrap z-10">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-neon text-dark-900 text-[10px] font-black rounded-full uppercase tracking-widest whitespace-nowrap z-10">
                 Most Popular
               </div>
             )}
             
-            <div className="text-center mb-5 pt-1">
-              <h2 className="text-lg sm:text-xl font-bold text-white">{tier.name}</h2>
-              <div className="mt-2">
-                <span className="text-3xl sm:text-4xl font-black text-white">{tier.price}</span>
-                <span className="text-gray-500 text-sm">{tier.period}</span>
+            <div className="text-center mb-6 pt-1">
+              <h2 className="text-lg sm:text-xl font-black text-white">{tier.name}</h2>
+              <div className="mt-3">
+                <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">{tier.price}</span>
+                <span className="text-gray-600 text-sm ml-1">{tier.period}</span>
               </div>
               {tier.yearlyPrice && (
-                <div className="text-xs text-gold mt-1">
+                <div className="text-xs text-gold mt-2 font-semibold">
                   or {tier.yearlyPrice}/year (save ~40%)
                 </div>
               )}
-              <p className="text-xs sm:text-sm text-gray-500 mt-2">{tier.description}</p>
+              <p className="text-xs sm:text-sm text-gray-600 mt-3">{tier.description}</p>
             </div>
 
-            <ul className="space-y-2 mb-6 flex-1">
+            <div className="h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent mb-5" />
+
+            <ul className="space-y-2.5 mb-8 flex-1">
               {tier.features.map(feature => (
-                <li key={feature} className="flex items-start gap-2 text-sm">
-                  <span className="text-neon mt-0.5 flex-shrink-0">✓</span>
+                <li key={feature} className="flex items-start gap-2.5 text-sm">
+                  <span className="text-neon mt-0.5 flex-shrink-0 text-xs">✓</span>
                   <span className="text-gray-300">{feature}</span>
                 </li>
               ))}
               {tier.notIncluded.map(feature => (
-                <li key={feature} className="flex items-start gap-2 text-sm">
-                  <span className="text-gray-700 mt-0.5 flex-shrink-0">✕</span>
-                  <span className="text-gray-600">{feature}</span>
+                <li key={feature} className="flex items-start gap-2.5 text-sm">
+                  <span className="text-gray-700 mt-0.5 flex-shrink-0 text-xs">✕</span>
+                  <span className="text-gray-700">{feature}</span>
                 </li>
               ))}
             </ul>
@@ -144,7 +146,7 @@ export default function PricingPage() {
             ) : (
               <Link 
                 href="/" 
-                className="block w-full py-3 rounded-xl font-bold text-center bg-white/5 text-gray-400 hover:bg-white/10 transition-all"
+                className="block w-full py-3.5 rounded-xl font-bold text-center bg-white/[0.04] text-gray-400 hover:bg-white/[0.08] transition-all text-sm"
               >
                 Get Started Free
               </Link>
@@ -154,18 +156,18 @@ export default function PricingPage() {
       </div>
 
       {/* Trust signals */}
-      <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 sm:mt-10 text-xs sm:text-sm text-gray-500">
+      <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mt-10 sm:mt-12 text-xs sm:text-sm text-gray-600 font-medium">
         <span>🔒 Secure payments via Stripe</span>
         <span>↩️ Cancel anytime</span>
         <span>💳 No hidden fees</span>
       </div>
 
       {/* FAQ */}
-      <div className="mt-12 sm:mt-16">
-        <h2 className="text-2xl font-black text-center mb-8">
+      <div className="mt-16 sm:mt-20">
+        <h2 className="text-2xl sm:text-3xl font-black text-center mb-10 tracking-tight">
           Frequently <span className="text-gold">Asked</span>
         </h2>
-        <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
+        <div className="space-y-3 max-w-2xl mx-auto">
           {[
             {
               q: 'Will this help me win the lottery?',
@@ -192,12 +194,12 @@ export default function PricingPage() {
               a: 'Pay yearly and save ~40%. Pro: $49.99/year (vs $83.88). Premium: $99.99/year (vs $155.88). Same features, better price.',
             },
           ].map(faq => (
-            <details key={faq.q} className="group rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-              <summary className="flex items-center justify-between p-4 sm:p-5 cursor-pointer font-bold text-sm sm:text-base text-white hover:text-gold transition-colors">
+            <details key={faq.q} className="group rounded-2xl border border-white/[0.04] bg-white/[0.01] overflow-hidden">
+              <summary className="flex items-center justify-between p-5 cursor-pointer font-bold text-sm sm:text-base text-gray-300 hover:text-white transition-colors">
                 {faq.q}
-                <span className="text-gray-600 group-open:rotate-45 transition-transform text-lg ml-2 flex-shrink-0">+</span>
+                <span className="text-gray-600 group-open:rotate-45 transition-transform text-lg ml-3 flex-shrink-0">+</span>
               </summary>
-              <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-sm text-gray-400 -mt-1">
+              <div className="px-5 pb-5 text-sm text-gray-500 -mt-1 leading-relaxed">
                 {faq.a}
               </div>
             </details>
@@ -205,8 +207,8 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <div className="text-center mt-8">
-        <Link href="/" className="text-sm text-gray-500 hover:text-neon transition-colors">
+      <div className="text-center mt-10">
+        <Link href="/" className="text-sm text-gray-600 hover:text-neon transition-colors font-medium">
           ← Back to Dashboard
         </Link>
       </div>

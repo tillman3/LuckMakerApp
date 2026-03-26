@@ -80,10 +80,10 @@ export default function CalculatorPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-3xl sm:text-4xl font-black mb-2">
+      <h1 className="text-3xl sm:text-5xl font-black mb-3 tracking-tight animate-fade-in-up">
         💰 What If I <span className="text-gold text-glow-gold">Win?</span>
       </h1>
-      <p className="text-gray-400 mb-8">
+      <p className="text-gray-500 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
         See exactly what you&apos;d take home after taxes. Spoiler: the government takes a lot.
       </p>
 
@@ -91,16 +91,16 @@ export default function CalculatorPage() {
         {/* Input */}
         <div className="lg:col-span-2 space-y-4">
           <div className="glass-card">
-            <h2 className="font-black text-lg mb-4">Your Hypothetical Win</h2>
+            <h2 className="font-black text-lg mb-4 tracking-tight">Your Hypothetical Win</h2>
 
-            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Jackpot Amount</label>
+            <label className="block text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-1.5">Jackpot Amount</label>
             <div className="relative mb-4">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
               <input
                 type="number"
                 value={jackpot}
                 onChange={e => setJackpot(e.target.value)}
-                className="w-full p-3 pl-7 rounded-xl bg-dark-900/50 border border-white/10 text-white focus:border-gold/30 focus:outline-none"
+                className="input-premium pl-7"
               />
             </div>
 
@@ -127,11 +127,11 @@ export default function CalculatorPage() {
               ))}
             </div>
 
-            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Your State</label>
+            <label className="block text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-1.5">Your State</label>
             <select
               value={state}
               onChange={e => setState(e.target.value)}
-              className="w-full p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white mb-4 focus:border-gold/30 focus:outline-none"
+              className="input-premium mb-4"
             >
               {Object.entries(STATES)
                 .sort((a, b) => a[1].name.localeCompare(b[1].name))
@@ -142,7 +142,7 @@ export default function CalculatorPage() {
                 ))}
             </select>
 
-            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2">Payment Type</label>
+            <label className="block text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-2">Payment Type</label>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <button
                 onClick={() => setPaymentType('lump')}
@@ -220,7 +220,7 @@ export default function CalculatorPage() {
                 <span className="text-gold font-black text-lg">
                   {paymentType === 'lump' ? 'You Take Home' : 'You Get Per Year'}
                 </span>
-                <span className="text-gold font-black text-2xl text-glow-gold">{fmt(afterTax)}</span>
+                <span className="jackpot-massive text-2xl">{fmt(afterTax)}</span>
               </div>
 
               {paymentType === 'annuity' && (

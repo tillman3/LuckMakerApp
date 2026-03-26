@@ -67,10 +67,10 @@ export default function GeneratorPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-3xl sm:text-4xl font-black mb-2">
+      <h1 className="text-3xl sm:text-5xl font-black mb-3 tracking-tight animate-fade-in-up">
         🎲 Smart <span className="text-neon text-glow-neon">Generator</span>
       </h1>
-      <p className="text-gray-400 mb-8">
+      <p className="text-gray-500 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
         Same odds of winning. Better odds of keeping it all.
       </p>
 
@@ -78,14 +78,14 @@ export default function GeneratorPage() {
         {/* Controls */}
         <div className="lg:col-span-1 space-y-4">
           <div className="glass-card">
-            <h2 className="font-bold text-lg mb-4">Settings</h2>
+            <h2 className="font-black text-lg mb-4 tracking-tight">Settings</h2>
             
             {/* Game selector */}
-            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Game</label>
+            <label className="block text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-1.5">Game</label>
             <select 
               value={selectedGame}
               onChange={e => { setSelectedGame(e.target.value); setResults([]); setWheelResult(null); }}
-              className="w-full p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white mb-4 focus:border-gold/30 focus:outline-none transition-colors"
+              className="input-premium mb-4"
             >
               {gameList.map(g => (
                 <option key={g.id} value={g.id}>{g.name}</option>
@@ -93,7 +93,7 @@ export default function GeneratorPage() {
             </select>
 
             {/* Strategy */}
-            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2">Strategy</label>
+            <label className="block text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-2">Strategy</label>
             <div className="space-y-2 mb-4">
               {[
                 { id: 'anti-popular', label: '🎯 Anti-Popular', desc: 'Avoids commonly picked numbers' },
@@ -116,11 +116,11 @@ export default function GeneratorPage() {
             </div>
 
             {/* Count */}
-            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Number of Sets</label>
+            <label className="block text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-1.5">Number of Sets</label>
             <select
               value={count}
               onChange={e => setCount(parseInt(e.target.value))}
-              className="w-full p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white mb-4 focus:border-gold/30 focus:outline-none"
+              className="input-premium mb-4"
             >
               {[1, 2, 3, 5, 10].map(n => (
                 <option key={n} value={n}>{n} set{n > 1 ? 's' : ''}</option>
@@ -133,7 +133,7 @@ export default function GeneratorPage() {
               className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all ${
                 generating 
                   ? 'bg-gold/10 text-gold/50 cursor-wait' 
-                  : 'bg-gradient-to-r from-gold/20 to-yellow-600/20 text-gold border border-gold/30 hover:border-gold/50 hover:from-gold/30 hover:to-yellow-600/30 glow-gold'
+                  : 'bg-gradient-to-r from-gold/15 to-yellow-600/15 text-gold border border-gold/20 hover:border-gold/40 hover:from-gold/25 hover:to-yellow-600/25'
               }`}
             >
               {generating ? (
@@ -149,8 +149,8 @@ export default function GeneratorPage() {
 
           {/* Info card */}
           <div className="glass-card border-gold/10">
-            <h3 className="font-bold text-gold text-sm mb-2">💡 Why Anti-Popular?</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
+            <h3 className="font-black text-gold text-sm mb-2">💡 Why Anti-Popular?</h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
               Every combination has identical odds. But some numbers are picked by fewer people 
               (birthdays = 1-31 are overplayed). If you win with unpopular numbers, 
               you&apos;re less likely to split. Same odds, bigger potential payout.
@@ -162,7 +162,7 @@ export default function GeneratorPage() {
         <div className="lg:col-span-2">
           {results.length > 0 && (
             <div className="space-y-3">
-              <h2 className="font-black text-lg text-gold">
+              <h2 className="font-black text-lg text-gold tracking-tight">
                 ✨ Your Numbers
               </h2>
               {results.map((result, i) => (

@@ -110,10 +110,10 @@ export default function TrackerPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-3xl sm:text-4xl font-black mb-2">
+      <h1 className="text-3xl sm:text-5xl font-black mb-3 tracking-tight animate-fade-in-up">
         🎯 Number <span className="text-neon text-glow-neon">Tracker</span>
       </h1>
-      <p className="text-gray-400 mb-8">
+      <p className="text-gray-500 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
         Save your numbers, track spending, stay in control.
       </p>
 

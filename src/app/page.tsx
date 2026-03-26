@@ -14,7 +14,6 @@ function getJackpotData() {
     const jackpots: Record<string, { amount: number; nextDraw: string; cashValue: number }> = {};
     const latestDraws: Record<string, { numbers: number[]; bonus: number | null; date: string }> = {};
     
-    // Get jackpots
     const jpRows = db.prepare('SELECT * FROM jackpots').all() as any[];
     for (const jp of jpRows) {
       jackpots[jp.game_id] = { 
@@ -24,7 +23,6 @@ function getJackpotData() {
       };
     }
     
-    // Get latest draws for hero display
     for (const gameId of ['powerball', 'mega_millions']) {
       const row = db.prepare(
         'SELECT numbers, bonus_number, draw_date FROM draws WHERE game_id = ? ORDER BY draw_date DESC LIMIT 1'
@@ -44,7 +42,6 @@ function getJackpotData() {
   }
 }
 
-// Default jackpots (fallback if DB empty)
 const DEFAULT_JACKPOTS: Record<string, number> = {
   powerball: 200_000_000,
   mega_millions: 350_000_000,
@@ -62,7 +59,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      {/* HERO — Slot Machine Style */}
+      {/* HERO */}
       <HeroSection 
         latestDraws={latestDraws}
         jackpots={jackpots}
@@ -73,125 +70,122 @@ export default function Dashboard() {
         <div className="ad-slot">Advertisement</div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <div className="glass-card text-center">
-            <div className="text-3xl font-bold text-neon text-glow-neon">8</div>
-            <div className="text-sm text-gray-400">Games Tracked</div>
-          </div>
-          <div className="glass-card text-center">
-            <div className="text-3xl font-bold text-gold text-glow-gold">80K+</div>
-            <div className="text-sm text-gray-400">Historical Draws</div>
-          </div>
-          <div className="glass-card text-center">
-            <div className="text-3xl font-bold text-white">Live</div>
-            <div className="text-sm text-gray-400">EV Calculations</div>
-          </div>
-          <div className="glass-card text-center">
-            <div className="text-3xl font-bold text-neon text-glow-neon">Free</div>
-            <div className="text-sm text-gray-400">Core Features</div>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-12">
+          {[
+            { value: '8', label: 'Games Tracked', color: 'text-neon', glow: 'text-glow-neon' },
+            { value: '80K+', label: 'Historical Draws', color: 'text-gold', glow: 'text-glow-gold' },
+            { value: 'Live', label: 'EV Calculations', color: 'text-white', glow: '' },
+            { value: 'Free', label: 'Core Features', color: 'text-neon', glow: 'text-glow-neon' },
+          ].map((stat, i) => (
+            <div key={i} className="glass-card-stat text-center animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className={`text-2xl sm:text-3xl font-black ${stat.color} ${stat.glow}`}>{stat.value}</div>
+              <div className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">{stat.label}</div>
+            </div>
+          ))}
         </div>
 
+        {/* Section divider */}
+        <div className="section-divider" />
+
         {/* Games Grid */}
-        <h2 className="text-2xl font-bold mb-6">
-          🎰 All Games — <span className="text-gold text-glow-gold">Live EV</span>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div className="mb-8 animate-fade-in-up">
+          <h2 className="text-2xl sm:text-3xl font-black mb-2 tracking-tight">
+            All Games — <span className="text-gold text-glow-gold">Live EV</span>
+          </h2>
+          <p className="text-sm text-gray-500">Real-time expected value for every game we track.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-8">
           {games.map((game, i) => {
             const jackpot = jackpots[game.id]?.amount || DEFAULT_JACKPOTS[game.id] || 0;
             const ev = calculateEV(game, jackpot);
             const breakeven = calculateBreakevenJackpot(game);
             
             return (
-              <GameCard 
-                key={game.id}
-                game={game}
-                jackpot={jackpot}
-                ev={ev}
-                breakeven={breakeven}
-                nextDraw={jackpots[game.id]?.nextDraw}
-              />
+              <div key={game.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.06}s` }}>
+                <GameCard 
+                  game={game}
+                  jackpot={jackpot}
+                  ev={ev}
+                  breakeven={breakeven}
+                  nextDraw={jackpots[game.id]?.nextDraw}
+                />
+              </div>
             );
           })}
         </div>
 
-        {/* AD SLOT: between_games_and_features */}
-        <div className="ad-slot mb-6">Advertisement</div>
+        {/* AD SLOT */}
+        <div className="ad-slot mb-10">Advertisement</div>
+
+        {/* Section divider */}
+        <div className="section-divider" />
 
         {/* Features Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Link href="/generator" className="glass-card group cursor-pointer">
-            <div className="text-3xl mb-3">🎲</div>
-            <h3 className="text-lg font-bold text-white group-hover:text-neon transition-colors">Smart Generator</h3>
-            <p className="text-sm text-gray-400 mt-2">
-              Anti-popular numbers that reduce your chance of splitting. 
-              Wheeling systems with coverage guarantees.
-            </p>
-          </Link>
-          <Link href="/results" className="glass-card group cursor-pointer">
-            <div className="text-3xl mb-3">📊</div>
-            <h3 className="text-lg font-bold text-white group-hover:text-gold transition-colors">Analytics</h3>
-            <p className="text-sm text-gray-400 mt-2">
-              Frequency charts, gap analysis, sum distributions. 
-              Interesting data — honestly labeled, not predictive.
-            </p>
-          </Link>
-          <Link href="/tracker" className="glass-card group cursor-pointer">
-            <div className="text-3xl mb-3">🎯</div>
-            <h3 className="text-lg font-bold text-white group-hover:text-neon transition-colors">Number Tracker</h3>
-            <p className="text-sm text-gray-400 mt-2">
-              Save your regular numbers, auto-check against results. 
-              Track spending vs winnings.
-            </p>
-          </Link>
-          <Link href="/pool" className="glass-card group cursor-pointer">
-            <div className="text-3xl mb-3">👥</div>
-            <h3 className="text-lg font-bold text-white group-hover:text-gold transition-colors">Pool Manager</h3>
-            <p className="text-sm text-gray-400 mt-2">
-              Run your office pool like a pro. Track who paid, manage tickets, split winnings.
-            </p>
-          </Link>
+        <div className="mb-8 animate-fade-in-up">
+          <h2 className="text-2xl sm:text-3xl font-black mb-2 tracking-tight">
+            Tools & <span className="text-neon text-glow-neon">Features</span>
+          </h2>
+          <p className="text-sm text-gray-500">Everything you need to play smarter.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-12">
+          {[
+            { href: '/generator', icon: '🎲', title: 'Smart Generator', desc: 'Anti-popular numbers that reduce your chance of splitting. Wheeling systems with coverage guarantees.', color: 'neon' },
+            { href: '/results', icon: '📊', title: 'Analytics', desc: 'Frequency charts, gap analysis, sum distributions. Interesting data — honestly labeled, not predictive.', color: 'gold' },
+            { href: '/tracker', icon: '🎯', title: 'Number Tracker', desc: 'Save your regular numbers, auto-check against results. Track spending vs winnings.', color: 'neon' },
+            { href: '/pool', icon: '👥', title: 'Pool Manager', desc: 'Run your office pool like a pro. Track who paid, manage tickets, split winnings.', color: 'gold' },
+          ].map((feature, i) => (
+            <Link key={feature.href} href={feature.href} className="glass-card-feature group cursor-pointer animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className="text-3xl mb-4">{feature.icon}</div>
+              <h3 className={`text-base font-black text-white group-hover:text-${feature.color} transition-colors duration-300 mb-2`}>{feature.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {feature.desc}
+              </p>
+              <div className={`mt-4 text-xs font-bold text-${feature.color}/40 group-hover:text-${feature.color}/80 transition-colors`}>
+                Explore →
+              </div>
+            </Link>
+          ))}
         </div>
 
         {/* Jackpot Alerts + Promos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8">
           <div className="md:col-span-1">
             <JackpotAlerts />
           </div>
           <Link href="/pool" className="glass-card border-gold/10 flex items-center group">
             <div>
-              <h3 className="font-black text-sm text-gold mb-2 group-hover:text-glow-gold">👥 Office Pool?</h3>
-              <p className="text-sm text-gray-400 mb-2">
+              <h3 className="font-black text-sm text-gold mb-2 group-hover:text-glow-gold transition-all">👥 Office Pool?</h3>
+              <p className="text-sm text-gray-500 mb-3 leading-relaxed">
                 Stop texting spreadsheets. AI-verified ticket photos, payment tracking, and auto-splits.
               </p>
-              <span className="text-xs text-gold font-bold">Create a pool →</span>
+              <span className="text-xs text-gold/60 font-bold group-hover:text-gold transition-colors">Create a pool →</span>
             </div>
           </Link>
           <Link href="/calculator" className="glass-card border-gold/10 flex items-center group">
             <div>
-              <h3 className="font-black text-sm text-gold mb-2 group-hover:text-glow-gold">💰 What If I Win?</h3>
-              <p className="text-sm text-gray-400 mb-2">
+              <h3 className="font-black text-sm text-gold mb-2 group-hover:text-glow-gold transition-all">💰 What If I Win?</h3>
+              <p className="text-sm text-gray-500 mb-3 leading-relaxed">
                 See exactly what you&apos;d take home after federal + state taxes. Lump sum vs annuity.
               </p>
-              <span className="text-xs text-gold font-bold">Try the calculator →</span>
+              <span className="text-xs text-gold/60 font-bold group-hover:text-gold transition-colors">Try the calculator →</span>
             </div>
           </Link>
         </div>
 
-        {/* Honest disclaimer banner */}
+        {/* Honest disclaimer */}
         <div className="glass-card text-center border-gold/10">
-          <p className="text-sm text-gray-400">
-            <span className="text-gold font-semibold">⚠️ Real Talk:</span>{' '}
+          <p className="text-sm text-gray-500">
+            <span className="text-gold font-bold">⚠️ Real Talk:</span>{' '}
             Lottery is entertainment. The house always has an edge. Our EV calculator shows you exactly 
             how big that edge is — and the rare moments when it flips in your favor. 
             We help you play smarter, not predict winners.
           </p>
         </div>
 
-        {/* AD SLOT: above_footer */}
-        <div className="ad-slot mt-6">Advertisement</div>
+        {/* AD SLOT */}
+        <div className="ad-slot mt-8">Advertisement</div>
       </div>
     </div>
   );
