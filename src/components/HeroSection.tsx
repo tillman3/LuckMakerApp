@@ -18,28 +18,25 @@ export function HeroSection({ latestDraws, jackpots }: HeroProps) {
 
   return (
     <section className="hero-bg relative overflow-hidden">
-      {/* Ambient glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gold/[0.03] rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-neon/[0.02] rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-purple-500/[0.015] rounded-full blur-[100px] pointer-events-none" />
+      {/* Single ambient glow — restrained */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gold/[0.03] rounded-full blur-[120px] pointer-events-none" />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
-        {/* Title */}
-        <div className="text-center mb-10 animate-fade-in-up">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black mb-4 tracking-tighter leading-none">
-            <span className="text-white">LUCK</span>{' '}
-            <span className="text-gold text-glow-gold">MAKER</span>{' '}
-            <span className="text-neon text-glow-neon">3000</span>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
+        {/* Title — let the typography do the work */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-3">
+            <span className="text-[rgba(255,255,255,0.95)]">Play</span>{' '}
+            <span className="text-gold text-glow-gold">Smarter</span>
           </h1>
-          <p className="text-base sm:text-lg text-gray-500 max-w-lg mx-auto font-medium">
-            Real math. Real odds. <span className="text-gold font-bold">Make your luck</span>.
+          <p className="text-sm sm:text-base text-muted max-w-md mx-auto">
+            Real math behind every ticket. EV calculations, smart number generation, and honest analytics.
           </p>
         </div>
 
-        {/* Dual Slot Machine Display */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto animate-fade-in-scale" style={{ animationDelay: '0.15s' }}>
+        {/* Dual Slot Machines */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
           {/* Powerball */}
-          <div className="glass-card relative overflow-hidden border-red-500/5 hover:border-red-500/15">
+          <div className="glass-card relative overflow-hidden">
             <div className="absolute inset-0 shimmer-gold pointer-events-none opacity-30" />
             <div className="relative z-10">
               {pb ? (
@@ -52,31 +49,23 @@ export function HeroSection({ latestDraws, jackpots }: HeroProps) {
                   bonusMax={26}
                 />
               ) : (
-                <div className="text-center py-10">
-                  <div className="slot-game-label">POWERBALL</div>
-                  <div className="jackpot-massive">
+                <div className="text-center py-6">
+                  <div className="text-[11px] font-bold tracking-widest text-muted uppercase mb-2">Powerball</div>
+                  <div className="jackpot-amount text-2xl font-black">
                     {pbJackpot ? `$${Math.round(pbJackpot.amount / 1e6)}M` : '---'}
                   </div>
                 </div>
               )}
               {pbJackpot?.nextDraw && (
-                <div className="mt-4 pt-3 border-t border-white/[0.04] text-center">
+                <div className="mt-4 pt-3 border-t border-[rgba(255,255,255,0.04)] text-center">
                   <Countdown targetDate={pbJackpot.nextDraw} />
                 </div>
               )}
-              <div className="text-center mt-2">
-                <Link 
-                  href="/games/powerball"
-                  className="text-xs font-semibold text-gold/30 hover:text-gold transition-colors"
-                >
-                  View EV Analysis →
-                </Link>
-              </div>
             </div>
           </div>
 
           {/* Mega Millions */}
-          <div className="glass-card relative overflow-hidden border-gold/5 hover:border-gold/15">
+          <div className="glass-card relative overflow-hidden">
             <div className="absolute inset-0 shimmer-gold pointer-events-none opacity-30" />
             <div className="relative z-10">
               {mm ? (
@@ -89,37 +78,29 @@ export function HeroSection({ latestDraws, jackpots }: HeroProps) {
                   bonusMax={25}
                 />
               ) : (
-                <div className="text-center py-10">
-                  <div className="slot-game-label">MEGA MILLIONS</div>
-                  <div className="jackpot-massive">
+                <div className="text-center py-6">
+                  <div className="text-[11px] font-bold tracking-widest text-muted uppercase mb-2">Mega Millions</div>
+                  <div className="jackpot-amount text-2xl font-black">
                     {mmJackpot ? `$${Math.round(mmJackpot.amount / 1e6)}M` : '---'}
                   </div>
                 </div>
               )}
               {mmJackpot?.nextDraw && (
-                <div className="mt-4 pt-3 border-t border-white/[0.04] text-center">
+                <div className="mt-4 pt-3 border-t border-[rgba(255,255,255,0.04)] text-center">
                   <Countdown targetDate={mmJackpot.nextDraw} />
                 </div>
               )}
-              <div className="text-center mt-2">
-                <Link 
-                  href="/games/mega_millions"
-                  className="text-xs font-semibold text-gold/30 hover:text-gold transition-colors"
-                >
-                  View EV Analysis →
-                </Link>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+        {/* CTAs — two clear options */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
           <Link href="/generator" className="btn-primary">
-            🎲 Generate Lucky Numbers
+            Generate Numbers
           </Link>
           <Link href="/games" className="btn-secondary">
-            📊 View All EV Ratings
+            View EV Ratings
           </Link>
         </div>
       </div>
