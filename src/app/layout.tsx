@@ -5,7 +5,7 @@ import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 
 const SITE_URL = 'https://luckmaker3000.com';
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'; // Replace with real GA4 ID
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-4ZQBLZ0Z3J';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     images: [{
-      url: `${SITE_URL}/og-image.png`,
+      url: `${SITE_URL}/opengraph-image`,
       width: 1200,
       height: 630,
       alt: 'Luck Maker 3000 — Smart Lottery Analytics',
@@ -34,7 +34,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Luck Maker 3000 — Smart Lottery Analytics',
     description: 'Free EV calculator shows you exactly when to play.',
-    images: [`${SITE_URL}/og-image.png`],
+    images: [`${SITE_URL}/opengraph-image`],
+  },
+  icons: {
+    icon: '/favicon.svg',
   },
   robots: {
     index: true,
