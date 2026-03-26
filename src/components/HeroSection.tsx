@@ -25,7 +25,7 @@ export function HeroSection({ latestDraws, jackpots }: HeroProps) {
         {/* Title — let the typography do the work */}
         <div className="text-center mb-10">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-3">
-            <span className="text-[rgba(255,255,255,0.95)]">Play</span>{' '}
+            <span className="text-[rgba(255,255,255,0.95)]">Luck is</span>{' '}
             <span className="text-gold text-glow-gold">a Skill</span>
           </h1>
           <p className="text-sm sm:text-base text-muted max-w-md mx-auto">
