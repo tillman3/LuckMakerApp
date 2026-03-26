@@ -1,25 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { addTicket } from '@/lib/pool-engine';
 
-// POST — add ticket to pool
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { poolId, numbers, bonusNumber, purchasedBy, ticketPhoto } = body;
+    const { poolId, numbers, bonusNumber, ticketPhoto, purchasedBy } = body;
     
     if (!poolId || !numbers) {
       return NextResponse.json({ error: 'poolId and numbers required' }, { status: 400 });
     }
+
+    if (!ticketPhoto) {
+      return NextResponse.json({ error: 'Ticket photo is required — take a photo of the physical ticket' }, { status: 400 });
+    }
     
-    const db = getDb();
+    const ticketId = addTicket(poolId, {
+      numbers,
+      bonusNumber,
+      ticketPhoto,
+      purchasedBy,
+    });
     
-    const result = db.prepare(`
-      INSERT INTO pool_tickets (pool_id, numbers, bonus_number, purchased_by, ticket_photo)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(poolId, numbers, bonusNumber || null, purchasedBy || null, ticketPhoto || null);
-    
-    return NextResponse.json({ id: result.lastInsertRowid, success: true });
+    return NextResponse.json({ id: ticketId, success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
