@@ -69,7 +69,7 @@ function parseTexasLotteryTable(html, gameConfig) {
             drawTime = cells[gameConfig.timeCol].trim();
           }
           
-          drawings.push({ drawDate, numbers: mainNumbers, bonus, jackpot, drawTime });
+          drawings.push({ drawDate, numbers: mainNumbers.sort((a, b) => a - b), bonus, jackpot, drawTime });
         }
       }
     }
@@ -284,22 +284,26 @@ async function updateAllOrNothing() {
 async function updateJackpots() {
   console.log('\n💰 Updating current jackpots...');
   
+  const check = db.prepare(`
+    SELECT id FROM draws WHERE game_id = ? AND draw_date = ? AND COALESCE(draw_time, '') = '' LIMIT 1
+  `);
+  
   try {
     // Powerball API
     const pbData = await fetch('https://data.ny.gov/resource/d6yy-54nr.json?$order=draw_date%20DESC&$limit=1');
     const pbJson = JSON.parse(pbData);
     if (pbJson.length > 0) {
       const pb = pbJson[0];
-      const numbers = pb.winning_numbers.split(' ').map(Number);
-      const mainNums = numbers.slice(0, 5);
-      const bonus = numbers[5] || parseInt(pb.mega_ball);
-      
-      const result = db.prepare(`
-        INSERT OR IGNORE INTO draws (game_id, draw_date, numbers, bonus_number)
-        VALUES (?, ?, ?, ?)
-      `).run('powerball', pb.draw_date.split('T')[0], mainNums.join(','), String(bonus));
-      
-      if (result.changes > 0) console.log(`  ✅ Powerball API: added ${pb.draw_date.split('T')[0]}`);
+      const drawDate = pb.draw_date.split('T')[0];
+      const existing = check.get('powerball', drawDate);
+      if (!existing) {
+        const numbers = pb.winning_numbers.split(' ').map(Number);
+        const mainNums = numbers.slice(0, 5).sort((a, b) => a - b);
+        const bonus = numbers[5] || parseInt(pb.mega_ball);
+        db.prepare(`INSERT INTO draws (game_id, draw_date, numbers, bonus_number) VALUES (?, ?, ?, ?)`)
+          .run('powerball', drawDate, mainNums.join(','), String(bonus));
+        console.log(`  ✅ Powerball API: added ${drawDate}`);
+      }
     }
   } catch (e) {
     console.log(`  ⚠️ Powerball API: ${e.message}`);
@@ -311,16 +315,16 @@ async function updateJackpots() {
     const mmJson = JSON.parse(mmData);
     if (mmJson.length > 0) {
       const mm = mmJson[0];
-      const numbers = mm.winning_numbers.split(' ').map(Number);
-      const mainNums = numbers.slice(0, 5);
-      const bonus = numbers[5] || parseInt(mm.mega_ball);
-      
-      const result = db.prepare(`
-        INSERT OR IGNORE INTO draws (game_id, draw_date, numbers, bonus_number)
-        VALUES (?, ?, ?, ?)
-      `).run('mega_millions', mm.draw_date.split('T')[0], mainNums.join(','), String(bonus));
-      
-      if (result.changes > 0) console.log(`  ✅ Mega Millions API: added ${mm.draw_date.split('T')[0]}`);
+      const drawDate = mm.draw_date.split('T')[0];
+      const existing = check.get('mega_millions', drawDate);
+      if (!existing) {
+        const numbers = mm.winning_numbers.split(' ').map(Number);
+        const mainNums = numbers.slice(0, 5).sort((a, b) => a - b);
+        const bonus = numbers[5] || parseInt(mm.mega_ball);
+        db.prepare(`INSERT INTO draws (game_id, draw_date, numbers, bonus_number) VALUES (?, ?, ?, ?)`)
+          .run('mega_millions', drawDate, mainNums.join(','), String(bonus));
+        console.log(`  ✅ Mega Millions API: added ${drawDate}`);
+      }
     }
   } catch (e) {
     console.log(`  ⚠️ Mega Millions API: ${e.message}`);

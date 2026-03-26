@@ -169,8 +169,13 @@ async function main() {
   const items = parseRSS(xml);
   console.log(`📡 RSS: ${items.length} items\n`);
   
+  const checkDraw = db.prepare(`
+    SELECT id FROM draws 
+    WHERE game_id = ? AND draw_date = ? AND COALESCE(draw_time, '') = ?
+    LIMIT 1
+  `);
   const insertDraw = db.prepare(`
-    INSERT OR IGNORE INTO draws (game_id, draw_date, draw_time, numbers, bonus_number)
+    INSERT INTO draws (game_id, draw_date, draw_time, numbers, bonus_number)
     VALUES (?, ?, ?, ?, ?)
   `);
   
@@ -187,16 +192,22 @@ async function main() {
       // Try parsing as winning numbers
       const draw = parseWinningNumbers(item);
       if (draw) {
-        const result = insertDraw.run(
-          draw.gameId,
-          draw.drawDate,
-          draw.drawTime,
-          draw.numbers.join(','),
-          draw.bonus ? String(draw.bonus) : null
-        );
-        if (result.changes > 0) {
+        // Sort numbers for non-ordered games (not pick3/daily4 where digit order matters)
+        const sortable = !['pick3', 'daily4'].includes(draw.gameId);
+        const nums = sortable ? draw.numbers.slice().sort((a, b) => a - b) : draw.numbers;
+        
+        // Check-then-insert to avoid NULL draw_time duplicate bug
+        const existing = checkDraw.get(draw.gameId, draw.drawDate, draw.drawTime || '');
+        if (!existing) {
+          insertDraw.run(
+            draw.gameId,
+            draw.drawDate,
+            draw.drawTime,
+            nums.join(','),
+            draw.bonus ? String(draw.bonus) : null
+          );
           drawsAdded++;
-          console.log(`  🎱 ${draw.gameId}${draw.drawTime ? ' ' + draw.drawTime : ''}: ${draw.drawDate} → ${draw.numbers.join(',')}${draw.bonus ? ' +' + draw.bonus : ''}`);
+          console.log(`  🎱 ${draw.gameId}${draw.drawTime ? ' ' + draw.drawTime : ''}: ${draw.drawDate} → ${nums.join(',')}${draw.bonus ? ' +' + draw.bonus : ''}`);
         }
       }
       
