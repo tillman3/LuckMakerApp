@@ -1,0 +1,309 @@
+/* ==========================================
+   SLOT MACHINE — Vegas-grade lottery reveal
+   ========================================== */
+
+.slot-machine {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.slot-game-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 215, 0, 0.6);
+  margin-bottom: 0.75rem;
+}
+
+/* ---- Machine Frame ---- */
+.slot-frame {
+  position: relative;
+  border-radius: 16px;
+  padding: 3px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.3),
+    rgba(255, 215, 0, 0.05),
+    rgba(255, 215, 0, 0.2),
+    rgba(255, 215, 0, 0.05),
+    rgba(255, 215, 0, 0.3)
+  );
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.15),
+    0 0 60px rgba(255, 215, 0, 0.05),
+    inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.slot-chrome-top,
+.slot-chrome-bottom {
+  height: 4px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 215, 0, 0.4), 
+    rgba(255, 255, 255, 0.2), 
+    rgba(255, 215, 0, 0.4), 
+    transparent
+  );
+  border-radius: 2px;
+  margin: 0 8px;
+}
+.slot-chrome-top { margin-bottom: 2px; }
+.slot-chrome-bottom { margin-top: 2px; }
+
+/* ---- Reels Container ---- */
+.slot-reels {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #050510, #0a0a1a, #050510);
+  border-radius: 12px;
+}
+
+.slot-divider {
+  width: 2px;
+  height: 52px;
+  background: linear-gradient(180deg, transparent, rgba(255, 215, 0, 0.4), transparent);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+
+/* ---- Individual Reel ---- */
+.reel-container {
+  position: relative;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.reel-window {
+  height: 52px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.reel-fade-top,
+.reel-fade-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 16px;
+  z-index: 2;
+  pointer-events: none;
+}
+.reel-fade-top {
+  top: 0;
+  background: linear-gradient(180deg, rgba(5, 5, 16, 0.9), transparent);
+}
+.reel-fade-bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(5, 5, 16, 0.9), transparent);
+}
+
+.reel-strip {
+  display: flex;
+  flex-direction: column;
+}
+
+.reel-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ---- Reel Spin Animation ---- */
+@keyframes reelSpin {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-52px); } /* One item height */
+}
+
+/* ---- Number Styling ---- */
+.reel-number {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reel-number-dim {
+  color: rgba(255, 255, 255, 0.15);
+  background: transparent;
+}
+
+.reel-number-active {
+  color: #1a1a2e;
+  background: linear-gradient(145deg, #ffffff, #e0e0e0);
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 0.3),
+    2px 3px 8px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.1),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+  animation: numberLand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reel-number-bonus-active {
+  color: #1a1a2e;
+  background: linear-gradient(145deg, #ffd700, #ffaa00);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 0 40px rgba(255, 215, 0, 0.2),
+    2px 3px 8px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 4px rgba(180, 130, 0, 0.3),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.5);
+  animation: numberLandBonus 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Number "lands" with a bounce + flash */
+@keyframes numberLand {
+  0% { transform: scale(0.5); opacity: 0; filter: blur(2px); }
+  50% { transform: scale(1.2); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; filter: blur(0); }
+}
+
+@keyframes numberLandBonus {
+  0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
+  40% { transform: scale(1.3) rotate(5deg); }
+  60% { transform: scale(0.9) rotate(-2deg); }
+  80% { transform: scale(1.05) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ---- Stop Flash ---- */
+.reel-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+  animation: reelFlash 0.3s ease-out forwards;
+  pointer-events: none;
+}
+.reel-flash-bonus {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4), transparent);
+}
+
+@keyframes reelFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---- Jackpot Display ---- */
+.slot-jackpot {
+  margin-top: 1rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.slot-jackpot-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.slot-jackpot-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  color: rgba(255, 215, 0, 0.5);
+  margin-bottom: 0.25rem;
+}
+
+.slot-jackpot-amount {
+  font-size: 1.75rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+  animation: jackpotPulse 2s ease-in-out infinite;
+}
+
+@keyframes jackpotPulse {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.3)); }
+  50% { filter: drop-shadow(0 0 24px rgba(255, 215, 0, 0.6)); }
+}
+
+/* ---- Gold Sparkle Particles ---- */
+.slot-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.slot-sparkle {
+  position: absolute;
+  top: -5px;
+  width: 4px;
+  height: 4px;
+  background: #ffd700;
+  border-radius: 50%;
+  animation: sparkleFloat linear infinite;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(80px) rotate(180deg) scale(0.6);
+  }
+  100% {
+    transform: translateY(160px) rotate(360deg) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .reel-container { width: 40px; }
+  .reel-window { height: 44px; }
+  .reel-number {
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+  }
+  .reel-item { height: 44px; }
+  .slot-reels { gap: 2px; padding: 6px 8px; }
+  .slot-jackpot-amount { font-size: 1.4rem; }
+  
+  @keyframes reelSpin {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-44px); }
+  }
+}
+
+@media (min-width: 640px) {
+  .reel-container { width: 56px; }
+  .reel-window { height: 60px; }
+  .reel-number {
+    font-size: 26px;
+    width: 52px;
+    height: 52px;
+  }
+  .reel-item { height: 60px; }
+  .slot-reels { gap: 6px; padding: 10px 16px; }
+  .slot-jackpot-amount { font-size: 2.2rem; }
+  
+  @keyframes reelSpin {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-60px); }
+  }
+}
