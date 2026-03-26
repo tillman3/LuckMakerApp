@@ -1,0 +1,273 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neon: #00ff88;
+  --color-neon-dim: #00cc6a;
+  --color-gold: #ffd700;
+  --color-gold-dim: #b8990a;
+  --color-dark-900: #06070d;
+  --color-dark-800: #0d0e17;
+  --color-dark-700: #161824;
+  --color-dark-600: #1f2236;
+  --color-dark-500: #2a2d45;
+  --color-danger: #ff4444;
+  --color-danger-dim: #cc2222;
+}
+
+body {
+  background-color: var(--color-dark-900);
+  color: #e0e0e0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-dark-800); }
+::-webkit-scrollbar-thumb { background: var(--color-dark-600); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-dark-500); }
+
+/* ========= GLOW EFFECTS ========= */
+.glow-neon {
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), 0 0 30px rgba(0, 255, 136, 0.1);
+}
+.glow-gold {
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.15);
+}
+.glow-danger {
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.3), 0 0 30px rgba(255, 68, 68, 0.1);
+}
+.text-glow-gold {
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.2);
+}
+.text-glow-neon {
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5), 0 0 40px rgba(0, 255, 136, 0.2);
+}
+
+/* ========= GLASS MORPHISM ========= */
+.glass {
+  background: rgba(13, 14, 23, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-card {
+  background: linear-gradient(135deg, rgba(22, 24, 36, 0.9), rgba(13, 14, 23, 0.95));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+}
+.glass-card:hover {
+  border-color: rgba(255, 215, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ========= CARD BASE (legacy compat) ========= */
+.card {
+  background: linear-gradient(135deg, rgba(22, 24, 36, 0.9), rgba(13, 14, 23, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========= LOTTERY BALLS ========= */
+.lottery-ball {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  position: relative;
+  background: linear-gradient(145deg, #ffffff, #e8e8e8);
+  color: #1a1a2e;
+  box-shadow: 
+    2px 3px 8px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.1),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+  transition: transform 0.2s;
+}
+.lottery-ball:hover {
+  transform: scale(1.1) translateY(-2px);
+}
+.lottery-ball::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  width: 12px;
+  height: 8px;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.9), transparent);
+  border-radius: 50%;
+}
+.lottery-ball-bonus {
+  background: linear-gradient(145deg, #ffd700, #ffaa00);
+  color: #1a1a2e;
+  box-shadow: 
+    2px 3px 8px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(255, 215, 0, 0.3),
+    inset -2px -2px 4px rgba(180, 130, 0, 0.3),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+.lottery-ball-red {
+  background: linear-gradient(145deg, #ff4444, #cc2222);
+  color: #ffffff;
+  box-shadow: 
+    2px 3px 8px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(255, 68, 68, 0.3),
+    inset -2px -2px 4px rgba(150, 20, 20, 0.3),
+    inset 2px 2px 4px rgba(255, 150, 150, 0.3);
+}
+.lottery-ball-sm {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+}
+
+/* ========= SLOT MACHINE ANIMATION ========= */
+@keyframes slot-spin {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+@keyframes slot-reveal {
+  0% { transform: translateY(-20px); opacity: 0; filter: blur(4px); }
+  60% { transform: translateY(3px); opacity: 1; filter: blur(0); }
+  80% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+@keyframes slot-bounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.15); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-slot-reveal {
+  animation: slot-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+.animate-slot-bounce {
+  animation: slot-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* ========= SHIMMER / SHINE ========= */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer-gold {
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ========= JACKPOT TEXT ========= */
+.jackpot-amount {
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+}
+
+/* ========= PULSE ========= */
+@keyframes pulse-neon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.2); }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ========= HERO BACKGROUND ========= */
+.hero-bg {
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, var(--color-dark-900) 0%, var(--color-dark-800) 100%);
+}
+
+/* ========= EV INDICATORS ========= */
+.ev-positive { color: var(--color-neon); }
+.ev-negative { color: var(--color-danger); }
+.ev-badge-play {
+  background: rgba(0, 255, 136, 0.15);
+  color: var(--color-neon);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+.ev-badge-skip {
+  background: rgba(255, 68, 68, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 68, 68, 0.2);
+}
+.ev-badge-borderline {
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--color-gold);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+/* ========= NAV GLASS ========= */
+.nav-glass {
+  background: rgba(6, 7, 13, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ========= AD SLOTS ========= */
+.ad-slot {
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========= COUNTDOWN ========= */
+.countdown-digit {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-variant-numeric: tabular-nums;
+}

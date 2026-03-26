@@ -1,0 +1,30 @@
+[Unit]
+Description=Luck Maker 3000 - Lottery Analytics
+After=network.target
+
+[Service]
+Type=simple
+User=tars
+Group=tars
+WorkingDirectory=/home/tars/.openclaw/workspace/luckmaker3000
+ExecStart=/usr/bin/node .next/standalone/server.js
+Restart=on-failure
+RestartSec=10
+Environment=NODE_ENV=production
+Environment=PORT=3001
+Environment=HOSTNAME=0.0.0.0
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=luckmaker3000
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/tars/.openclaw/workspace/luckmaker3000/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
