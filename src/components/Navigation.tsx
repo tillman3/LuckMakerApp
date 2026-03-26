@@ -11,6 +11,7 @@ export function Navigation() {
     { href: '/games', label: 'Games & EV' },
     { href: '/generator', label: 'Generator' },
     { href: '/results', label: 'Results' },
+    { href: '/pool', label: 'Pool' },
     { href: '/tracker', label: 'Tracker' },
     { href: '/about', label: 'About' },
   ];

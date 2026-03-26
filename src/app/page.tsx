@@ -3,6 +3,7 @@ import { getAllGames } from '@/lib/games';
 import { calculateEV, calculateBreakevenJackpot, formatCurrency, formatOdds } from '@/lib/ev-calculator';
 import { GameCard } from '@/components/GameCard';
 import { HeroSection } from '@/components/HeroSection';
+import { JackpotAlerts } from '@/components/JackpotAlerts';
 import { getDb } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -120,7 +121,7 @@ export default function Dashboard() {
         <div className="ad-slot mb-6">Advertisement</div>
 
         {/* Features Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <Link href="/generator" className="glass-card group cursor-pointer">
             <div className="text-3xl mb-3">🎲</div>
             <h3 className="text-lg font-bold text-white group-hover:text-neon transition-colors">Smart Generator</h3>
@@ -145,6 +146,32 @@ export default function Dashboard() {
               Track spending vs winnings.
             </p>
           </Link>
+          <Link href="/pool" className="glass-card group cursor-pointer">
+            <div className="text-3xl mb-3">👥</div>
+            <h3 className="text-lg font-bold text-white group-hover:text-gold transition-colors">Pool Manager</h3>
+            <p className="text-sm text-gray-400 mt-2">
+              Run your office pool like a pro. Track who paid, manage tickets, split winnings.
+            </p>
+          </Link>
+        </div>
+
+        {/* Jackpot Alerts + Disclaimer */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="md:col-span-1">
+            <JackpotAlerts />
+          </div>
+          <div className="md:col-span-2 glass-card border-gold/10 flex items-center">
+            <div>
+              <h3 className="font-black text-sm text-gold mb-2">👥 Office Pool?</h3>
+              <p className="text-sm text-gray-400 mb-3">
+                Stop texting spreadsheets. Our Pool Manager tracks payments, stores ticket photos, 
+                and calculates splits automatically.
+              </p>
+              <Link href="/pool" className="text-xs text-gold hover:underline font-bold">
+                Create a pool →
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Honest disclaimer banner */}
