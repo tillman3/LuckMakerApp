@@ -8,7 +8,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
   
-  if (!token) return NextResponse.json({ error: 'Token required' }, { status: 400 });
+  if (!token || token.length < 16) return NextResponse.json({ error: 'Valid token required' }, { status: 400 });
+  
+  // Token must be alphanumeric/hex — reject anything suspicious
+  if (!/^[a-zA-Z0-9_-]+$/.test(token)) return NextResponse.json({ error: 'Invalid token format' }, { status: 400 });
   
   const db = getDb();
   const tickets = db.prepare(
@@ -80,6 +83,7 @@ export async function POST(req: NextRequest) {
       success: true 
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Vault POST error:', error.message);
+    return NextResponse.json({ error: 'Failed to save ticket.' }, { status: 500 });
   }
 }

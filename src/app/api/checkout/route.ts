@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Checkout error:', error.message);
     return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
+      { error: 'Failed to create checkout session. Please try again.' },
       { status: 500 }
     );
   }
