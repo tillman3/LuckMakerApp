@@ -96,8 +96,8 @@ function insertDraws(gameId, drawings) {
     LIMIT 1
   `);
   const insert = db.prepare(`
-    INSERT INTO draws (game_id, draw_date, draw_time, numbers, bonus_number, jackpot)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO draws (game_id, draw_date, draw_time, numbers, bonus_number, fireball, jackpot)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
   
   let inserted = 0;
@@ -112,6 +112,7 @@ function insertDraws(gameId, drawings) {
           d.drawTime || null,
           nums,
           d.bonus ? String(d.bonus) : null,
+          d.fireball != null ? String(d.fireball) : null,
           d.jackpot
         );
         inserted++;
@@ -193,14 +194,59 @@ async function updateCashFive() {
   }
 }
 
+// Parse Pick 3 / Daily 4 format: Date | Morning Nums | Fireball | Day Nums | Fireball | Evening Nums | Fireball | Night Nums | Fireball
+function parseFireballGame(html, numCount) {
+  const drawings = [];
+  const DRAW_TIMES = ['Morning', 'Day', 'Evening', 'Night'];
+  const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+  
+  let match;
+  while ((match = rowRegex.exec(html)) !== null) {
+    const rowHtml = match[1];
+    const cells = [];
+    let cellMatch;
+    while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
+      cells.push(cellMatch[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim());
+    }
+    cellRegex.lastIndex = 0;
+    
+    if (cells.length < 9) continue; // Date + 4*(numbers + fireball)
+    
+    const dateMatch = cells[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!dateMatch) continue;
+    
+    const [, month, day, year] = dateMatch;
+    const drawDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    
+    // Columns: [date, morning_nums, morning_fb, day_nums, day_fb, evening_nums, evening_fb, night_nums, night_fb]
+    for (let i = 0; i < 4; i++) {
+      const numsText = cells[1 + i * 2];
+      const fireballText = cells[2 + i * 2];
+      
+      const numbers = numsText.split(/[\s\-–]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+      const fireball = parseInt(fireballText);
+      
+      if (numbers.length === numCount) {
+        drawings.push({
+          drawDate,
+          drawTime: DRAW_TIMES[i],
+          numbers,
+          bonus: null,
+          fireball: !isNaN(fireball) ? fireball : null,
+          jackpot: null
+        });
+      }
+    }
+  }
+  return drawings;
+}
+
 async function updatePick3() {
   console.log('🎱 Updating Pick 3...');
   try {
-    const html = await fetch('https://www.texaslottery.com/export/sites/lottery/Games/Pick_3/Winning_Numbers/index.html_2013354932.html');
-    const drawings = parseTexasLotteryTable(html, {
-      mainNumbers: 3, bonusNumbers: 0, jackpotCol: -1, timeCol: -1, hasDrawTimes: false
-    });
-    // Pick 3 has 4 draws per day - try to parse draw time from table
+    const html = await fetch('https://www.texaslottery.com/export/sites/lottery/Games/Pick_3/Winning_Numbers/');
+    const drawings = parseFireballGame(html, 3);
     const inserted = insertDraws('pick3', drawings);
     console.log(`  ✅ Pick 3: ${inserted} new draws (${drawings.length} total scraped)`);
   } catch (e) {
@@ -211,10 +257,8 @@ async function updatePick3() {
 async function updateDaily4() {
   console.log('🎱 Updating Daily 4...');
   try {
-    const html = await fetch('https://www.texaslottery.com/export/sites/lottery/Games/Daily_4/Winning_Numbers/index.html_2013354932.html');
-    const drawings = parseTexasLotteryTable(html, {
-      mainNumbers: 4, bonusNumbers: 0, jackpotCol: -1, timeCol: -1, hasDrawTimes: false
-    });
+    const html = await fetch('https://www.texaslottery.com/export/sites/lottery/Games/Daily_4/Winning_Numbers/');
+    const drawings = parseFireballGame(html, 4);
     const inserted = insertDraws('daily4', drawings);
     console.log(`  ✅ Daily 4: ${inserted} new draws (${drawings.length} total scraped)`);
   } catch (e) {

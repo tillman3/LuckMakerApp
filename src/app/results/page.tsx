@@ -16,6 +16,7 @@ interface DrawRow {
   draw_time: string | null;
   numbers: string;
   bonus_number: string | null;
+  fireball: string | null;
   multiplier: number | null;
 }
 
@@ -29,7 +30,7 @@ export default function ResultsPage() {
     const db = getDb();
     for (const gameId of GAME_ORDER) {
       const rows = db.prepare(
-        'SELECT game_id, draw_date, draw_time, numbers, bonus_number, multiplier FROM draws WHERE game_id = ? ORDER BY draw_date DESC, draw_time DESC LIMIT 10'
+        'SELECT game_id, draw_date, draw_time, numbers, bonus_number, fireball, multiplier FROM draws WHERE game_id = ? ORDER BY draw_date DESC, draw_time DESC LIMIT 10'
       ).all(gameId) as DrawRow[];
       if (rows.length > 0) {
         recentDraws[gameId] = rows;
@@ -106,6 +107,14 @@ export default function ResultsPage() {
                       </span>
                     </>
                   )}
+                  {latest.fireball && (
+                    <>
+                      <span className="text-gray-600 mx-1">🔥</span>
+                      <span className="lottery-ball lottery-ball-fireball">
+                        {latest.fireball}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -129,6 +138,14 @@ export default function ResultsPage() {
                             <span className="text-gray-700 text-xs mx-0.5">+</span>
                             <span className={`lottery-ball lottery-ball-sm ${gameId === 'powerball' ? 'lottery-ball-red' : 'lottery-ball-bonus'}`}>
                               {draw.bonus_number}
+                            </span>
+                          </>
+                        )}
+                        {draw.fireball && (
+                          <>
+                            <span className="text-gray-700 text-xs mx-0.5">🔥</span>
+                            <span className="lottery-ball lottery-ball-sm lottery-ball-fireball">
+                              {draw.fireball}
                             </span>
                           </>
                         )}
