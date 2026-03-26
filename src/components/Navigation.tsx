@@ -14,6 +14,7 @@ export function Navigation() {
     { href: '/pool', label: 'Pool' },
     { href: '/calculator', label: 'What If' },
     { href: '/tracker', label: 'Tracker' },
+    { href: '/blog', label: 'Blog' },
   ];
 
   return (
