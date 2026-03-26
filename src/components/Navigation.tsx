@@ -12,6 +12,7 @@ export function Navigation() {
     { href: '/generator', label: 'Generator' },
     { href: '/results', label: 'Results' },
     { href: '/pool', label: 'Pool' },
+    { href: '/calculator', label: 'What If' },
     { href: '/tracker', label: 'Tracker' },
     { href: '/about', label: 'About' },
   ];

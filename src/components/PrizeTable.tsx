@@ -12,7 +12,7 @@ export function PrizeTable({ ev, game, jackpot }: PrizeTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-dark-600">
+          <tr className="border-b border-white/5">
             <th className="text-left py-2 text-gray-400 font-medium">Match</th>
             <th className="text-right py-2 text-gray-400 font-medium">Prize</th>
             <th className="text-right py-2 text-gray-400 font-medium">Odds</th>
@@ -22,7 +22,7 @@ export function PrizeTable({ ev, game, jackpot }: PrizeTableProps) {
         </thead>
         <tbody>
           {ev.breakdown.map((row, i) => (
-            <tr key={i} className="border-b border-dark-700">
+            <tr key={i} className="border-b border-white/5">
               <td className="py-2 text-white font-medium">{row.match}</td>
               <td className="py-2 text-right text-gold">
                 {game.prizeTable[i]?.prize === 'jackpot' 
@@ -42,7 +42,7 @@ export function PrizeTable({ ev, game, jackpot }: PrizeTableProps) {
             </tr>
           ))}
           {/* Total row */}
-          <tr className="border-t-2 border-dark-500">
+          <tr className="border-t-2 border-white/10">
             <td className="py-2 text-white font-bold" colSpan={4}>
               Total EV per ${game.ticketCost} ticket
             </td>
@@ -54,7 +54,7 @@ export function PrizeTable({ ev, game, jackpot }: PrizeTableProps) {
             <td className="py-1 text-gray-500" colSpan={4}>Ticket cost</td>
             <td className="py-1 text-right text-gray-400">-{formatCurrency(game.ticketCost)}</td>
           </tr>
-          <tr className="border-t border-dark-600">
+          <tr className="border-t border-white/5">
             <td className="py-2 text-white font-bold" colSpan={4}>Net EV</td>
             <td className={`py-2 text-right font-bold text-lg ${ev.isPositiveEV ? 'text-neon' : 'text-danger'}`}>
               {ev.netEV >= 0 ? '+' : ''}{formatCurrency(ev.netEV)}

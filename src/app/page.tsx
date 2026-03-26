@@ -155,23 +155,29 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Jackpot Alerts + Disclaimer */}
+        {/* Jackpot Alerts + Promos */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="md:col-span-1">
             <JackpotAlerts />
           </div>
-          <div className="md:col-span-2 glass-card border-gold/10 flex items-center">
+          <Link href="/pool" className="glass-card border-gold/10 flex items-center group">
             <div>
-              <h3 className="font-black text-sm text-gold mb-2">👥 Office Pool?</h3>
-              <p className="text-sm text-gray-400 mb-3">
-                Stop texting spreadsheets. Our Pool Manager tracks payments, stores ticket photos, 
-                and calculates splits automatically.
+              <h3 className="font-black text-sm text-gold mb-2 group-hover:text-glow-gold">👥 Office Pool?</h3>
+              <p className="text-sm text-gray-400 mb-2">
+                Stop texting spreadsheets. AI-verified ticket photos, payment tracking, and auto-splits.
               </p>
-              <Link href="/pool" className="text-xs text-gold hover:underline font-bold">
-                Create a pool →
-              </Link>
+              <span className="text-xs text-gold font-bold">Create a pool →</span>
             </div>
-          </div>
+          </Link>
+          <Link href="/calculator" className="glass-card border-gold/10 flex items-center group">
+            <div>
+              <h3 className="font-black text-sm text-gold mb-2 group-hover:text-glow-gold">💰 What If I Win?</h3>
+              <p className="text-sm text-gray-400 mb-2">
+                See exactly what you&apos;d take home after federal + state taxes. Lump sum vs annuity.
+              </p>
+              <span className="text-xs text-gold font-bold">Try the calculator →</span>
+            </div>
+          </Link>
         </div>
 
         {/* Honest disclaimer banner */}
