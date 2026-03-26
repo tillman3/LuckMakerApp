@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { GAMES, GameConfig } from '@/lib/games';
+import { GAMES } from '@/lib/games';
 import { generateAntiPopular, generateQuickPick, generateBalanced, generateWheel, GeneratedNumbers, WheelResult } from '@/lib/number-generator';
-import type { Metadata } from 'next';
 
 const gameList = Object.values(GAMES);
 
@@ -12,6 +11,8 @@ export default function GeneratorPage() {
   const [strategy, setStrategy] = useState<string>('anti-popular');
   const [results, setResults] = useState<GeneratedNumbers[]>([]);
   const [count, setCount] = useState(5);
+  const [generating, setGenerating] = useState(false);
+  const [revealedSets, setRevealedSets] = useState<number>(0);
   
   // Wheeling
   const [wheelNumbers, setWheelNumbers] = useState<string>('');
@@ -20,28 +21,38 @@ export default function GeneratorPage() {
   const game = GAMES[selectedGame];
 
   function handleGenerate() {
-    const newResults: GeneratedNumbers[] = [];
-    for (let i = 0; i < count; i++) {
-      let result: GeneratedNumbers;
-      switch (strategy) {
-        case 'anti-popular':
-          result = generateAntiPopular(game.mainNumbers, game.mainMax);
-          break;
-        case 'balanced':
-          result = generateBalanced(game.mainNumbers, game.mainMax);
-          break;
-        default:
-          result = generateQuickPick(game.mainNumbers, game.mainMax);
+    setGenerating(true);
+    setResults([]);
+    setRevealedSets(0);
+    
+    // Small delay for theatrical effect
+    setTimeout(() => {
+      const newResults: GeneratedNumbers[] = [];
+      for (let i = 0; i < count; i++) {
+        let result: GeneratedNumbers;
+        switch (strategy) {
+          case 'anti-popular':
+            result = generateAntiPopular(game.mainNumbers, game.mainMax);
+            break;
+          case 'balanced':
+            result = generateBalanced(game.mainNumbers, game.mainMax);
+            break;
+          default:
+            result = generateQuickPick(game.mainNumbers, game.mainMax);
+        }
+        if (game.bonusNumbers > 0) {
+          result.bonusNumber = Math.floor(Math.random() * game.bonusMax) + 1;
+        }
+        newResults.push(result);
       }
+      setResults(newResults);
+      setGenerating(false);
       
-      // Add bonus number if needed
-      if (game.bonusNumbers > 0) {
-        result.bonusNumber = Math.floor(Math.random() * game.bonusMax) + 1;
-      }
-      
-      newResults.push(result);
-    }
-    setResults(newResults);
+      // Stagger reveal each set
+      newResults.forEach((_, i) => {
+        setTimeout(() => setRevealedSets(prev => prev + 1), 150 * (i + 1));
+      });
+    }, 600);
   }
 
   function handleWheel() {
@@ -56,8 +67,8 @@ export default function GeneratorPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-3xl font-bold mb-2">
-        🎲 Smart Number <span className="text-neon">Generator</span>
+      <h1 className="text-3xl sm:text-4xl font-black mb-2">
+        🎲 Smart <span className="text-neon text-glow-neon">Generator</span>
       </h1>
       <p className="text-gray-400 mb-8">
         Same odds of winning. Better odds of keeping it all.
@@ -66,15 +77,15 @@ export default function GeneratorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Controls */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="card">
+          <div className="glass-card">
             <h2 className="font-bold text-lg mb-4">Settings</h2>
             
             {/* Game selector */}
-            <label className="block text-sm text-gray-400 mb-1">Game</label>
+            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Game</label>
             <select 
               value={selectedGame}
               onChange={e => { setSelectedGame(e.target.value); setResults([]); setWheelResult(null); }}
-              className="w-full p-2 rounded-lg bg-dark-700 border border-dark-500 text-white mb-4"
+              className="w-full p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white mb-4 focus:border-gold/30 focus:outline-none transition-colors"
             >
               {gameList.map(g => (
                 <option key={g.id} value={g.id}>{g.name}</option>
@@ -82,34 +93,34 @@ export default function GeneratorPage() {
             </select>
 
             {/* Strategy */}
-            <label className="block text-sm text-gray-400 mb-1">Strategy</label>
+            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2">Strategy</label>
             <div className="space-y-2 mb-4">
               {[
                 { id: 'anti-popular', label: '🎯 Anti-Popular', desc: 'Avoids commonly picked numbers' },
-                { id: 'quick-pick', label: '🎲 Quick Pick', desc: 'Truly random' },
-                { id: 'balanced', label: '⚖️ Balanced', desc: 'Spread across ranges' },
+                { id: 'quick-pick', label: '🎲 Quick Pick', desc: 'Truly random selection' },
+                { id: 'balanced', label: '⚖️ Balanced', desc: 'Spread across all ranges' },
               ].map(s => (
                 <button
                   key={s.id}
                   onClick={() => setStrategy(s.id)}
-                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                  className={`w-full text-left p-3 rounded-xl border transition-all ${
                     strategy === s.id 
-                      ? 'border-neon/30 bg-neon/5 text-neon' 
-                      : 'border-dark-600 bg-dark-700 text-gray-300 hover:border-dark-500'
+                      ? 'border-neon/30 bg-neon/5 text-neon glow-neon' 
+                      : 'border-white/5 bg-dark-900/30 text-gray-300 hover:border-white/10'
                   }`}
                 >
                   <div className="font-semibold text-sm">{s.label}</div>
-                  <div className="text-xs text-gray-500">{s.desc}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{s.desc}</div>
                 </button>
               ))}
             </div>
 
             {/* Count */}
-            <label className="block text-sm text-gray-400 mb-1">Number of Sets</label>
+            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Number of Sets</label>
             <select
               value={count}
               onChange={e => setCount(parseInt(e.target.value))}
-              className="w-full p-2 rounded-lg bg-dark-700 border border-dark-500 text-white mb-4"
+              className="w-full p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white mb-4 focus:border-gold/30 focus:outline-none"
             >
               {[1, 2, 3, 5, 10].map(n => (
                 <option key={n} value={n}>{n} set{n > 1 ? 's' : ''}</option>
@@ -118,19 +129,31 @@ export default function GeneratorPage() {
 
             <button
               onClick={handleGenerate}
-              className="w-full py-3 rounded-lg bg-neon/20 text-neon border border-neon/30 font-bold hover:bg-neon/30 transition-colors"
+              disabled={generating}
+              className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all ${
+                generating 
+                  ? 'bg-gold/10 text-gold/50 cursor-wait' 
+                  : 'bg-gradient-to-r from-gold/20 to-yellow-600/20 text-gold border border-gold/30 hover:border-gold/50 hover:from-gold/30 hover:to-yellow-600/30 glow-gold'
+              }`}
             >
-              Generate Numbers ✨
+              {generating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="inline-block w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                  Generating...
+                </span>
+              ) : (
+                '🎰 Generate Numbers'
+              )}
             </button>
           </div>
 
           {/* Info card */}
-          <div className="card bg-dark-700/50 border-gold/10">
+          <div className="glass-card border-gold/10">
             <h3 className="font-bold text-gold text-sm mb-2">💡 Why Anti-Popular?</h3>
-            <p className="text-xs text-gray-400">
-              Every number combination has the exact same odds of winning. But some numbers 
-              are picked by fewer people. If you win with unpopular numbers, you&apos;re less 
-              likely to split the jackpot. Same odds, bigger potential payout.
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Every combination has identical odds. But some numbers are picked by fewer people 
+              (birthdays = 1-31 are overplayed). If you win with unpopular numbers, 
+              you&apos;re less likely to split. Same odds, bigger potential payout.
             </p>
           </div>
         </div>
@@ -139,20 +162,27 @@ export default function GeneratorPage() {
         <div className="lg:col-span-2">
           {results.length > 0 && (
             <div className="space-y-3">
-              <h2 className="font-bold text-lg">Generated Numbers</h2>
+              <h2 className="font-black text-lg text-gold">
+                ✨ Your Numbers
+              </h2>
               {results.map((result, i) => (
-                <div key={i} className="card flex items-center gap-4">
-                  <div className="text-sm text-gray-500 w-8">#{i + 1}</div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                <div 
+                  key={i} 
+                  className={`glass-card flex items-center gap-3 sm:gap-4 transition-all duration-300 ${
+                    i < revealedSets ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                  }`}
+                >
+                  <div className="text-sm text-gray-600 w-8 flex-shrink-0 font-bold">#{i + 1}</div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                     {result.numbers.map((num, j) => (
-                      <span key={j} className="w-10 h-10 rounded-full bg-dark-600 border border-neon/30 flex items-center justify-center text-white font-bold">
+                      <span key={j} className="lottery-ball lottery-ball-sm">
                         {num}
                       </span>
                     ))}
                     {result.bonusNumber !== undefined && (
                       <>
-                        <span className="text-gray-600">+</span>
-                        <span className="w-10 h-10 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center text-gold font-bold">
+                        <span className="text-gray-600 text-sm mx-0.5">+</span>
+                        <span className="lottery-ball lottery-ball-sm lottery-ball-bonus">
                           {result.bonusNumber}
                         </span>
                       </>
@@ -160,71 +190,88 @@ export default function GeneratorPage() {
                   </div>
                 </div>
               ))}
-              <div className="text-xs text-gray-500 mt-2">
-                Strategy: {results[0]?.strategy} — {results[0]?.reasoning}
+              <div className="text-xs text-gray-600 mt-2 px-1">
+                {results[0]?.strategy} — {results[0]?.reasoning}
               </div>
             </div>
           )}
 
+          {results.length === 0 && !generating && (
+            <div className="glass-card text-center py-12 border-white/5">
+              <div className="text-5xl mb-4">🎰</div>
+              <p className="text-gray-500">Select a game and strategy, then hit generate.</p>
+              <p className="text-xs text-gray-600 mt-2">Your lucky numbers are waiting.</p>
+            </div>
+          )}
+
+          {generating && (
+            <div className="glass-card text-center py-12">
+              <div className="text-5xl mb-4 animate-bounce">🎲</div>
+              <p className="text-gold font-bold animate-pulse">Generating your numbers...</p>
+            </div>
+          )}
+
           {/* Wheeling System */}
-          <div className="card mt-6">
-            <h2 className="font-bold text-lg mb-2">🎡 Wheeling System</h2>
+          <div className="glass-card mt-6">
+            <h2 className="font-black text-lg mb-2">🎡 Wheeling System</h2>
             <p className="text-sm text-gray-400 mb-4">
-              Enter your favorite numbers. We&apos;ll generate optimized ticket sets that 
+              Enter your favorite numbers — we&apos;ll generate ticket sets that 
               guarantee minimum match levels if enough of your numbers hit.
             </p>
             
-            <div className="flex gap-2 mb-4">
+            <div className="flex flex-col sm:flex-row gap-2 mb-4">
               <input
                 type="text"
                 value={wheelNumbers}
                 onChange={e => setWheelNumbers(e.target.value)}
-                placeholder={`Enter ${game.mainNumbers + 2}+ numbers separated by commas (1-${game.mainMax})`}
-                className="flex-1 p-2 rounded-lg bg-dark-700 border border-dark-500 text-white placeholder-gray-600"
+                placeholder={`${game.mainNumbers + 2}+ numbers, comma separated`}
+                className="flex-1 p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white placeholder-gray-600 focus:border-gold/30 focus:outline-none"
               />
               <button
                 onClick={handleWheel}
-                className="px-4 py-2 rounded-lg bg-gold/20 text-gold border border-gold/30 font-bold hover:bg-gold/30 transition-colors"
+                className="px-6 py-3 rounded-xl bg-gold/10 text-gold border border-gold/30 font-bold hover:bg-gold/20 transition-all whitespace-nowrap"
               >
-                Generate Wheel
+                Build Wheel
               </button>
             </div>
 
             {wheelResult && (
               <div className="space-y-3">
-                <div className="p-3 bg-dark-700/50 rounded-lg">
-                  <div className="text-sm text-neon font-semibold">{wheelResult.guarantee}</div>
+                <div className="p-3 bg-neon/5 rounded-xl border border-neon/10">
+                  <div className="text-sm text-neon font-bold">{wheelResult.guarantee}</div>
                   <div className="text-xs text-gray-400 mt-1">
-                    {wheelResult.totalTickets} tickets × ${game.ticketCost} = ${wheelResult.totalTickets * game.ticketCost} total
+                    {wheelResult.totalTickets} tickets × ${game.ticketCost} = <span className="text-gold">${wheelResult.totalTickets * game.ticketCost}</span> total
                   </div>
                 </div>
                 
-                {wheelResult.tickets.map((ticket, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 w-12">Ticket {i + 1}</span>
-                    <div className="flex gap-1">
-                      {ticket.map((num, j) => (
-                        <span key={j} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                          wheelResult.inputNumbers.includes(num) 
-                            ? 'bg-neon/20 text-neon border border-neon/30' 
-                            : 'bg-dark-600 text-gray-400'
-                        }`}>
-                          {num}
-                        </span>
-                      ))}
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {wheelResult.tickets.map((ticket, i) => (
+                    <div key={i} className="flex items-center gap-2 py-1">
+                      <span className="text-xs text-gray-600 w-16 flex-shrink-0">Ticket {i + 1}</span>
+                      <div className="flex gap-1 flex-wrap">
+                        {ticket.map((num, j) => (
+                          <span key={j} className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                            wheelResult.inputNumbers.includes(num) 
+                              ? 'bg-neon/10 text-neon border border-neon/20' 
+                              : 'bg-white/5 text-gray-500'
+                          }`}>
+                            {num}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
           {/* Disclaimer */}
-          <div className="mt-6 p-3 rounded-lg bg-dark-700/30 border border-dark-600">
+          <div className="mt-6 p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <p className="text-xs text-gray-500">
               ⚠️ Generated numbers have the same probability of winning as any other combination. 
               The anti-popular strategy reduces split probability, not win probability. 
-              The lottery is a game of chance — play for fun, within your budget.
+              The lottery is entertainment — play within your budget.
             </p>
           </div>
         </div>

@@ -89,14 +89,14 @@ body {
 
 /* ========= LOTTERY BALLS ========= */
 .lottery-ball {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   position: relative;
   background: linear-gradient(145deg, #ffffff, #e8e8e8);
   color: #1a1a2e;
@@ -138,9 +138,21 @@ body {
     inset 2px 2px 4px rgba(255, 150, 150, 0.3);
 }
 .lottery-ball-sm {
-  width: 36px;
-  height: 36px;
-  font-size: 13px;
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+/* Larger balls on desktop */
+@media (min-width: 640px) {
+  .lottery-ball { width: 44px; height: 44px; font-size: 16px; }
+  .lottery-ball-sm { width: 36px; height: 36px; font-size: 13px; }
+}
+
+/* Touch-friendly tap targets */
+@media (max-width: 640px) {
+  .glass-card { padding: 1rem; }
+  button, select, input { min-height: 44px; } /* iOS tap target */
 }
 
 /* ========= SLOT MACHINE ANIMATION ========= */
