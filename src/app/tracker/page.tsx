@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { GAMES } from '@/lib/games';
+import { useAuth, hasAccess } from '@/lib/auth-context';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 import Link from 'next/link';
 
 interface SavedNumber {
@@ -20,6 +22,9 @@ interface SpendingEntry {
 }
 
 export default function TrackerPage() {
+  const { plan, loading } = useAuth();
+  const isPro = hasAccess(plan, 'pro');
+
   const [selectedGame, setSelectedGame] = useState('powerball');
   const [numbers, setNumbers] = useState('');
   const [bonusNum, setBonusNum] = useState('');
@@ -47,7 +52,6 @@ export default function TrackerPage() {
       alert(`Enter exactly ${game.mainNumbers} numbers for ${game.name}`);
       return;
     }
-
     const entry: SavedNumber = {
       id: Date.now(),
       game_id: selectedGame,
@@ -56,7 +60,6 @@ export default function TrackerPage() {
       label: label || null,
       created_at: new Date().toISOString(),
     };
-
     const updated = [...savedNumbers, entry];
     setSavedNumbers(updated);
     localStorage.setItem('lm3k_saved_numbers', JSON.stringify(updated));
@@ -75,7 +78,6 @@ export default function TrackerPage() {
     const amount = parseFloat(spendAmount) || 0;
     const tickets = parseInt(spendTickets) || 0;
     if (amount <= 0) return;
-
     const existing = spending.find(s => s.game_id === selectedGame);
     let updated: SpendingEntry[];
     if (existing) {
@@ -87,7 +89,6 @@ export default function TrackerPage() {
     } else {
       updated = [...spending, { game_id: selectedGame, total_spent: amount, total_tickets: tickets }];
     }
-
     setSpending(updated);
     localStorage.setItem('lm3k_spending', JSON.stringify(updated));
   }
@@ -107,6 +108,50 @@ export default function TrackerPage() {
   const totalTickets = spending.reduce((sum, s) => sum + s.total_tickets, 0);
   const budgetNum = parseFloat(monthlyBudget) || 0;
   const budgetPercent = budgetNum > 0 ? Math.min((totalSpent / budgetNum) * 100, 100) : 0;
+
+  // If not Pro, show upgrade prompt
+  if (!loading && !isPro) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+        <h1 className="text-3xl sm:text-5xl font-black mb-3 tracking-tight animate-fade-in-up">
+          🎯 Number <span className="text-neon text-glow-neon">Tracker</span>
+        </h1>
+        <p className="text-gray-500 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
+          Save your numbers, track spending, stay in control.
+        </p>
+
+        {/* Preview of what they'd get */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div className="glass-card text-center opacity-60">
+            <div className="text-3xl mb-3">💾</div>
+            <h3 className="font-bold text-sm">Save Your Numbers</h3>
+            <p className="text-xs text-gray-500 mt-1">Keep your lucky picks organized</p>
+          </div>
+          <div className="glass-card text-center opacity-60">
+            <div className="text-3xl mb-3">💰</div>
+            <h3 className="font-bold text-sm">Spending Tracker</h3>
+            <p className="text-xs text-gray-500 mt-1">Set budgets, track every purchase</p>
+          </div>
+          <div className="glass-card text-center opacity-60">
+            <div className="text-3xl mb-3">🔔</div>
+            <h3 className="font-bold text-sm">Auto-Check Results</h3>
+            <p className="text-xs text-gray-500 mt-1">Get notified when your numbers hit</p>
+          </div>
+          <div className="glass-card text-center opacity-60">
+            <div className="text-3xl mb-3">📊</div>
+            <h3 className="font-bold text-sm">Win/Loss Analytics</h3>
+            <p className="text-xs text-gray-500 mt-1">See your true P&L over time</p>
+          </div>
+        </div>
+
+        <UpgradePrompt
+          plan="pro"
+          title="Track Your Numbers with Pro"
+          message="Save numbers, auto-check results, and track your spending vs winnings. Everything a smart player needs."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
@@ -184,7 +229,6 @@ export default function TrackerPage() {
             </div>
           </div>
 
-          {/* Budget bar */}
           {budgetNum > 0 && (
             <div className="mb-4">
               <div className="flex justify-between text-xs mb-1">
@@ -238,7 +282,6 @@ export default function TrackerPage() {
             </button>
           </div>
 
-          {/* Budget setting */}
           <div className="flex gap-2 mt-3 pt-3 border-t border-white/5">
             <div className="flex-1 relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-sm">$</span>
@@ -330,17 +373,6 @@ export default function TrackerPage() {
           <p className="text-xs text-gray-600 mt-1">Save your regular picks to auto-check against results.</p>
         </div>
       )}
-
-      {/* Pro upsell */}
-      <div className="glass-card mt-6 text-center border-neon/10">
-        <h3 className="font-black text-neon text-sm mb-2">⚡ Want Auto-Check?</h3>
-        <p className="text-sm text-gray-400 mb-3">
-          Pro members get automatic result checking — we&apos;ll notify you when your saved numbers match!
-        </p>
-        <Link href="/pricing" className="inline-block px-6 py-2.5 rounded-xl bg-neon/10 text-neon border border-neon/20 font-bold text-sm hover:bg-neon/20 transition-all">
-          Go Pro — $6.99/mo
-        </Link>
-      </div>
     </div>
   );
 }

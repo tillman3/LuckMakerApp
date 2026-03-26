@@ -3,8 +3,36 @@ import { getDb } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+function checkSubscriber(req: NextRequest): { authorized: boolean; plan?: string } {
+  const customerId = req.cookies.get('lm_customer')?.value;
+  if (!customerId) return { authorized: false };
+  
+  try {
+    const db = getDb();
+    const sub = db.prepare(
+      `SELECT plan, status, current_period_end FROM subscribers WHERE stripe_customer_id = ? LIMIT 1`
+    ).get(customerId) as any;
+    
+    if (!sub || (sub.status !== 'active' && sub.status !== 'trialing')) return { authorized: false };
+    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return { authorized: false };
+    
+    const tiers = ['free', 'pro', 'premium'];
+    if (tiers.indexOf(sub.plan) >= tiers.indexOf('pro')) {
+      return { authorized: true, plan: sub.plan };
+    }
+    return { authorized: false };
+  } catch {
+    return { authorized: false };
+  }
+}
+
 // GET — fetch user's tickets
 export async function GET(req: NextRequest) {
+  const auth = checkSubscriber(req);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: 'Pro subscription required for vault access' }, { status: 403 });
+  }
+
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
   
@@ -33,6 +61,11 @@ export async function GET(req: NextRequest) {
 
 // POST — add ticket to vault
 export async function POST(req: NextRequest) {
+  const auth = checkSubscriber(req);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: 'Pro subscription required for vault access' }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const { userToken, gameId, drawDate, drawTime, numbers, bonusNumber, purchasePrice, ticketPhoto, notes } = body;

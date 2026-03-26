@@ -3,12 +3,16 @@
 import { useState } from 'react';
 import { GAMES } from '@/lib/games';
 import Link from 'next/link';
+import { useAuth, hasAccess } from '@/lib/auth-context';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 
 const poolGames = Object.values(GAMES).filter(g =>
   ['powerball', 'mega_millions', 'lotto_texas', 'texas_two_step', 'cash_five'].includes(g.id)
 );
 
 export default function PoolPage() {
+  const { plan, loading: authLoading } = useAuth();
+  const isPremium = hasAccess(plan, 'premium');
   const [view, setView] = useState<'landing' | 'create' | 'success'>('landing');
   const [step, setStep] = useState(1);
 
@@ -121,6 +125,45 @@ export default function PoolPage() {
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // ---- PREMIUM GATE ----
+  if (!authLoading && !isPremium) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="text-3xl sm:text-5xl font-black mb-3 tracking-tight animate-fade-in-up">
+          👥 Lottery <span className="text-gold text-glow-gold">Pool Manager</span>
+        </h1>
+        <p className="text-gray-500 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
+          The tamper-proof way to run a group lottery pool. Every action logged, every ticket verified.
+        </p>
+
+        {/* Show what they'd get */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="glass-card text-center opacity-60">
+            <div className="text-2xl mb-2">📋</div>
+            <h3 className="font-bold text-sm">Full Audit Log</h3>
+            <p className="text-xs text-gray-500 mt-1">Every action timestamped</p>
+          </div>
+          <div className="glass-card text-center opacity-60">
+            <div className="text-2xl mb-2">🤖</div>
+            <h3 className="font-bold text-sm">AI Ticket Verification</h3>
+            <p className="text-xs text-gray-500 mt-1">Claude Vision confirms tickets</p>
+          </div>
+          <div className="glass-card text-center opacity-60">
+            <div className="text-2xl mb-2">🔐</div>
+            <h3 className="font-bold text-sm">Tamper-Proof</h3>
+            <p className="text-xs text-gray-500 mt-1">Lock before draw, auto-check</p>
+          </div>
+        </div>
+
+        <UpgradePrompt
+          plan="premium"
+          title="Pool Manager — Premium Feature"
+          message="Run tamper-proof lottery pools with AI ticket verification, audit logs, and automatic result checking."
+        />
       </div>
     );
   }

@@ -1,12 +1,28 @@
+'use client';
+
 import Link from 'next/link';
-import type { Metadata } from 'next';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Welcome to Pro!',
-  robots: 'noindex',
-};
+function SuccessContent() {
+  const searchParams = useSearchParams();
+  const [cookieSet, setCookieSet] = useState(false);
 
-export default function SuccessPage() {
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    if (sessionId && !cookieSet) {
+      fetch('/api/auth/set-cookie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+        credentials: 'include',
+      })
+        .then(res => res.json())
+        .then(() => setCookieSet(true))
+        .catch(() => {});
+    }
+  }, [searchParams, cookieSet]);
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-16 text-center">
       <div className="glass-card">
@@ -53,5 +69,22 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="glass-card animate-pulse">
+          <div className="text-6xl mb-6">🎉</div>
+          <h1 className="text-3xl font-black mb-4">
+            <span className="text-gold text-glow-gold">Setting up your account...</span>
+          </h1>
+        </div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }

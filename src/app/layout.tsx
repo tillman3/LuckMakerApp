@@ -3,6 +3,7 @@ import Script from 'next/script';
 import './globals.css';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
+import { AuthProvider } from '@/lib/auth-context';
 
 const SITE_URL = 'https://luckmaker3000.com';
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-4ZQBLZ0Z3J';
@@ -75,9 +76,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-screen flex flex-col">
-        <Navigation />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -26,6 +26,7 @@ export function Footer() {
               <Link href="/pricing" className="text-gray-600 hover:text-white transition-colors">Pricing</Link>
               <Link href="/games" className="text-gray-600 hover:text-white transition-colors">All Games</Link>
               <Link href="/results" className="text-gray-600 hover:text-white transition-colors">Results</Link>
+              <Link href="/support" className="text-gray-600 hover:text-white transition-colors">Support</Link>
             </div>
           </div>
           <div>
