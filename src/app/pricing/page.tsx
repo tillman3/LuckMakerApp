@@ -14,7 +14,7 @@ const tiers = [
     yearlyPrice: null,
     period: 'forever',
     description: 'Everything you need to start',
-    color: 'border-white/5',
+    borderClass: 'border-white/5',
     plan: null,
     features: [
       'All draw results — every game',
@@ -39,7 +39,7 @@ const tiers = [
     yearlyPrice: '$49.99',
     period: '/month',
     description: 'For players who want an edge',
-    color: 'border-neon/20',
+    borderClass: 'border-neon/30',
     plan: 'pro_monthly',
     popular: true,
     features: [
@@ -65,11 +65,12 @@ const tiers = [
     yearlyPrice: '$99.99',
     period: '/month',
     description: 'For groups & power users',
-    color: 'border-gold/20',
+    borderClass: 'border-gold/30',
     plan: 'premium_monthly',
     features: [
       'Everything in Pro, plus:',
       'Lottery pool manager',
+      'AI ticket photo verification',
       'Advanced analytics & data exports',
       'Historical EV charts',
       'Multi-state tracking',
@@ -84,11 +85,11 @@ const tiers = [
 export default function PricingPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <div className="text-center mb-12">
+      <div className="text-center mb-10 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl font-black mb-3">
           Simple, <span className="text-gold text-glow-gold">Honest</span> Pricing
         </h1>
-        <p className="text-gray-400 text-lg">
+        <p className="text-gray-400 sm:text-lg">
           Most features are free. Upgrade when you&apos;re ready.
         </p>
         <p className="text-xs text-gray-600 mt-2">
@@ -96,30 +97,34 @@ export default function PricingPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Mobile: stack vertically. Desktop: 3 columns */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
         {tiers.map(tier => (
-          <div key={tier.name} className={`glass-card relative ${tier.color} ${tier.popular ? 'glow-neon' : ''}`}>
+          <div 
+            key={tier.name} 
+            className={`relative rounded-2xl border bg-white/[0.02] backdrop-blur-sm p-5 sm:p-6 flex flex-col ${tier.borderClass} ${tier.popular ? 'ring-1 ring-neon/20 shadow-[0_0_20px_rgba(0,255,136,0.05)]' : ''}`}
+          >
             {tier.popular && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-neon text-dark-900 text-xs font-black rounded-full uppercase tracking-wider">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-neon text-dark-900 text-[11px] font-black rounded-full uppercase tracking-wider whitespace-nowrap z-10">
                 Most Popular
               </div>
             )}
             
-            <div className="text-center mb-6 pt-2">
-              <h2 className="text-xl font-bold text-white">{tier.name}</h2>
-              <div className="mt-3">
-                <span className="text-4xl font-black text-white">{tier.price}</span>
-                <span className="text-gray-500">{tier.period}</span>
+            <div className="text-center mb-5 pt-1">
+              <h2 className="text-lg sm:text-xl font-bold text-white">{tier.name}</h2>
+              <div className="mt-2">
+                <span className="text-3xl sm:text-4xl font-black text-white">{tier.price}</span>
+                <span className="text-gray-500 text-sm">{tier.period}</span>
               </div>
               {tier.yearlyPrice && (
                 <div className="text-xs text-gold mt-1">
                   or {tier.yearlyPrice}/year (save ~40%)
                 </div>
               )}
-              <p className="text-sm text-gray-500 mt-2">{tier.description}</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-2">{tier.description}</p>
             </div>
 
-            <ul className="space-y-2.5 mb-8">
+            <ul className="space-y-2 mb-6 flex-1">
               {tier.features.map(feature => (
                 <li key={feature} className="flex items-start gap-2 text-sm">
                   <span className="text-neon mt-0.5 flex-shrink-0">✓</span>
@@ -149,18 +154,18 @@ export default function PricingPage() {
       </div>
 
       {/* Trust signals */}
-      <div className="flex flex-wrap justify-center gap-6 mt-10 text-sm text-gray-500">
+      <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 sm:mt-10 text-xs sm:text-sm text-gray-500">
         <span>🔒 Secure payments via Stripe</span>
         <span>↩️ Cancel anytime</span>
         <span>💳 No hidden fees</span>
       </div>
 
       {/* FAQ */}
-      <div className="mt-16">
+      <div className="mt-12 sm:mt-16">
         <h2 className="text-2xl font-black text-center mb-8">
           Frequently <span className="text-gold">Asked</span>
         </h2>
-        <div className="space-y-4 max-w-2xl mx-auto">
+        <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
           {[
             {
               q: 'Will this help me win the lottery?',
@@ -187,10 +192,15 @@ export default function PricingPage() {
               a: 'Pay yearly and save ~40%. Pro: $49.99/year (vs $83.88). Premium: $99.99/year (vs $155.88). Same features, better price.',
             },
           ].map(faq => (
-            <div key={faq.q} className="glass-card">
-              <h3 className="font-bold text-white mb-2">{faq.q}</h3>
-              <p className="text-sm text-gray-400">{faq.a}</p>
-            </div>
+            <details key={faq.q} className="group rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
+              <summary className="flex items-center justify-between p-4 sm:p-5 cursor-pointer font-bold text-sm sm:text-base text-white hover:text-gold transition-colors">
+                {faq.q}
+                <span className="text-gray-600 group-open:rotate-45 transition-transform text-lg ml-2 flex-shrink-0">+</span>
+              </summary>
+              <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-sm text-gray-400 -mt-1">
+                {faq.a}
+              </div>
+            </details>
           ))}
         </div>
       </div>

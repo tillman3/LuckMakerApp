@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GAMES } from '@/lib/games';
+import { TicketUpload } from '@/components/TicketUpload';
 import Link from 'next/link';
 
 interface Member {
@@ -48,6 +49,8 @@ export default function PoolDetailPage({ params }: { params: { code: string } })
   // Add ticket form
   const [newTicketNumbers, setNewTicketNumbers] = useState('');
   const [newTicketBonus, setNewTicketBonus] = useState('');
+  const [ticketPhotoUrl, setTicketPhotoUrl] = useState<string | null>(null);
+  const [showAddTicket, setShowAddTicket] = useState(false);
 
   useEffect(() => {
     fetchPool();
@@ -92,6 +95,10 @@ export default function PoolDetailPage({ params }: { params: { code: string } })
 
   async function addTicket() {
     if (!newTicketNumbers.trim()) return;
+    if (!ticketPhotoUrl) {
+      alert('A verified ticket photo is required to add a ticket.');
+      return;
+    }
     await fetch('/api/pools/tickets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -99,10 +106,13 @@ export default function PoolDetailPage({ params }: { params: { code: string } })
         poolId: pool?.id, 
         numbers: newTicketNumbers.trim(),
         bonusNumber: newTicketBonus || null,
+        ticketPhoto: ticketPhotoUrl,
       }),
     });
     setNewTicketNumbers('');
     setNewTicketBonus('');
+    setTicketPhotoUrl(null);
+    setShowAddTicket(false);
     fetchPool();
   }
 
@@ -233,58 +243,134 @@ export default function PoolDetailPage({ params }: { params: { code: string } })
 
       {/* Tickets */}
       <div className="glass-card mb-6">
-        <h2 className="font-black text-lg mb-4">🎫 Tickets</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-black text-lg">🎫 Tickets</h2>
+          {!showAddTicket && (
+            <button
+              onClick={() => setShowAddTicket(true)}
+              className="px-4 py-2 rounded-xl bg-gold/10 text-gold text-sm font-bold border border-gold/20 hover:bg-gold/20 transition-all"
+            >
+              + Add Ticket
+            </button>
+          )}
+        </div>
         
-        {tickets.length === 0 ? (
-          <p className="text-gray-500 text-sm mb-4">No tickets added yet.</p>
+        {tickets.length === 0 && !showAddTicket ? (
+          <div className="text-center py-6">
+            <div className="text-3xl mb-2">📸</div>
+            <p className="text-gray-500 text-sm mb-1">No tickets yet</p>
+            <p className="text-xs text-gray-600">Take a photo of your purchased ticket to add it.</p>
+          </div>
         ) : (
-          <div className="space-y-2 mb-4">
+          <div className="space-y-3 mb-4">
             {tickets.map(ticket => (
-              <div key={ticket.id} className={`p-3 rounded-xl ${ticket.is_winner ? 'bg-gold/10 border border-gold/20' : 'bg-white/[0.02]'}`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {ticket.numbers.split(',').map((num, j) => (
-                    <span key={j} className="lottery-ball lottery-ball-sm">{num.trim()}</span>
-                  ))}
-                  {ticket.bonus_number && (
-                    <>
-                      <span className="text-gray-600 text-xs">+</span>
-                      <span className="lottery-ball lottery-ball-sm lottery-ball-bonus">{ticket.bonus_number}</span>
-                    </>
+              <div key={ticket.id} className={`rounded-xl overflow-hidden ${ticket.is_winner ? 'border border-gold/20' : 'border border-white/5'}`}>
+                {ticket.ticket_photo && (
+                  <div className="bg-dark-900/50">
+                    <img 
+                      src={ticket.ticket_photo} 
+                      alt="Ticket photo" 
+                      className="w-full max-h-48 object-contain cursor-pointer"
+                      onClick={() => window.open(ticket.ticket_photo!, '_blank')}
+                    />
+                  </div>
+                )}
+                <div className={`p-3 ${ticket.is_winner ? 'bg-gold/10' : 'bg-white/[0.02]'}`}>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {ticket.numbers.split(',').map((num, j) => (
+                      <span key={j} className="lottery-ball lottery-ball-sm">{num.trim()}</span>
+                    ))}
+                    {ticket.bonus_number && (
+                      <>
+                        <span className="text-gray-600 text-xs mx-0.5">+</span>
+                        <span className="lottery-ball lottery-ball-sm lottery-ball-bonus">{ticket.bonus_number}</span>
+                      </>
+                    )}
+                    {ticket.ticket_photo && (
+                      <span className="ml-auto text-xs text-neon/60">📸 Verified</span>
+                    )}
+                  </div>
+                  {ticket.match_details && (
+                    <p className="text-xs text-gold mt-2">{ticket.match_details}</p>
                   )}
                 </div>
-                {ticket.match_details && (
-                  <p className="text-xs text-gold mt-2">{ticket.match_details}</p>
-                )}
               </div>
             ))}
           </div>
         )}
         
-        {/* Add ticket */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="text"
-            value={newTicketNumbers}
-            onChange={e => setNewTicketNumbers(e.target.value)}
-            placeholder="Numbers (e.g., 7,14,23,45,62)"
-            className="flex-1 p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white placeholder-gray-600 focus:border-gold/30 focus:outline-none"
-          />
-          {game && game.bonusNumbers > 0 && (
-            <input
-              type="text"
-              value={newTicketBonus}
-              onChange={e => setNewTicketBonus(e.target.value)}
-              placeholder="Bonus"
-              className="w-20 p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white placeholder-gray-600 focus:border-gold/30 focus:outline-none"
-            />
-          )}
-          <button
-            onClick={addTicket}
-            className="px-4 py-3 rounded-xl bg-gold/10 text-gold font-bold border border-gold/20 hover:bg-gold/20 transition-all whitespace-nowrap"
-          >
-            + Ticket
-          </button>
-        </div>
+        {/* Add ticket with photo */}
+        {showAddTicket && (
+          <div className="p-4 rounded-xl border border-gold/10 bg-gold/[0.02] space-y-4">
+            <h3 className="font-bold text-sm text-gold">Add Ticket</h3>
+            
+            {/* Step 1: Photo (required) */}
+            <div>
+              <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2">
+                Step 1: Ticket Photo <span className="text-danger">*required</span>
+              </label>
+              <TicketUpload 
+                poolId={pool.id}
+                gameId={pool.game_id}
+                drawDate={pool.draw_date || undefined}
+                onUploaded={(data) => {
+                  setTicketPhotoUrl(data.photoUrl);
+                  // Auto-fill numbers from AI extraction
+                  if (data.extractedData.numbers) {
+                    setNewTicketNumbers(data.extractedData.numbers);
+                  }
+                  if (data.extractedData.bonusNumber) {
+                    setNewTicketBonus(data.extractedData.bonusNumber);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Step 2: Numbers (auto-filled by AI or manual) */}
+            <div>
+              <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">
+                Step 2: Numbers {ticketPhotoUrl ? '(AI pre-filled — verify)' : '(enter after photo)'}
+              </label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={newTicketNumbers}
+                  onChange={e => setNewTicketNumbers(e.target.value)}
+                  placeholder="e.g., 7, 14, 23, 45, 62"
+                  disabled={!ticketPhotoUrl}
+                  className="flex-1 p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white placeholder-gray-600 focus:border-gold/30 focus:outline-none disabled:opacity-30"
+                />
+                {game && game.bonusNumbers > 0 && (
+                  <input
+                    type="text"
+                    value={newTicketBonus}
+                    onChange={e => setNewTicketBonus(e.target.value)}
+                    placeholder="Bonus"
+                    disabled={!ticketPhotoUrl}
+                    className="w-24 p-3 rounded-xl bg-dark-900/50 border border-white/10 text-white placeholder-gray-600 focus:border-gold/30 focus:outline-none disabled:opacity-30"
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={addTicket}
+                disabled={!ticketPhotoUrl || !newTicketNumbers.trim()}
+                className="flex-1 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-gold/20 to-yellow-600/20 text-gold border border-gold/30 hover:border-gold/50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                ✓ Add Verified Ticket
+              </button>
+              <button
+                onClick={() => { setShowAddTicket(false); setTicketPhotoUrl(null); setNewTicketNumbers(''); setNewTicketBonus(''); }}
+                className="px-4 py-3 rounded-xl text-gray-500 border border-white/10 hover:bg-white/5 transition-all text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Winnings Calculator */}
